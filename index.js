@@ -2,24 +2,20 @@ const { response } = require("express");
 const express = require("express");
 const app = express();
 const port = 3000;
-const location = require("./location");
-const car = require("./car");
+
+const location = require("./routes/location/location");
+const car_order_by_type = require("./routes/car/car_order_by_type");
+const car_order_by_price = require("./routes/car/car_order_by_price");
+const affiliate = require("./routes/affiliate/affiliate");
+
+app.use("/locations", location);
+app.use("/cars-order-by-type", car_order_by_type);
+app.use("/cars-order-by-price", car_order_by_price);
+app.use("/affiliate", affiliate);
 
 // 시작
 app.get("/", function(req, res){
     res.send("Hello World!\n");
-});
-
-app.use("/location", location);
-app.use("/car", car);
-
-// index로 렌트카 업체 하나의 정보 불러오기
-app.get("/affiliate/:index", function(req, res){
-    const sql = "select * from affiliate where a_index = ?";
-    con.query(sql, [req.params.index], function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
 });
 
 // 없는 api일 때
