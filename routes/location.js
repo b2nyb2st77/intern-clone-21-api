@@ -1,85 +1,40 @@
 const express = require("express");
 const router = express.Router();
-const mysql = require("../mysql");
+const mysql = require("../db/mysql");
+const sql_query = require("../db/location");
 const con = mysql.init();
 
-// 모든 지역 정보 불러오기
-router.get("/all", function(req, res){
-    const sql = "SELECT * from location";
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
+// 지역선택
+router.get("/", function(req, res){
+    const type = req.param('type');
 
-// 지역선택 - 인기 지역
-router.get("/popular", function(req, res){
-    const sql = `SELECT distinct l_subname from location 
-                 WHERE l_popular_or_not = 'y'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
+    // 지역선택 - 인기 지역
+    if(type == 'popular'){
+        const sql = sql_query.popular();
 
-// 지역선택 - 공항
-router.get("/airport", function(req, res){
-    const sql = `SELECT distinct l_name, l_immediate_or_not from location
-                 WHERE l_type = '공항'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
+        const execSql = con.query(sql, function(err, result){
+            if(err) throw err;
+            res.send(result);
+        });
 
-// 지역선택 - KTX역
-router.get("/ktx", function(req, res){
-    const sql = `SELECT distinct l_name, l_immediate_or_not from location 
-                 WHERE l_type = 'KTX역'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
+        console.log(execSql.sql);
+    }
+    // 지역선택 - 공항(airport), KTX역(ktx), SRT역(srt), 버스터미널(bus), 지역(region), 해외(abroad)
+    else if(type == 'airport' || type == 'ktx' || type == 'srt' || type == 'bus' || type == 'region' || type == 'abroad'){
+        const sql = sql_query.othertype();
+        
+        const execSql = con.query(sql, type, function(err, result){
+            if(err) throw err;
+            res.send(result);
+        });
 
-// 지역선택 - SRT역
-router.get("/srt", function(req, res){
-    const sql = `SELECT distinct l_name, l_immediate_or_not from location 
-                 WHERE l_type = 'SRT역'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
+        console.log(execSql.sql);
+    }
+    // 다른 것을 입력했을 경우 예외 처리
+    else {
+        res.status(404).send("NOT FOUND\n");
+    }
 
-// 지역선택 - 버스터미널
-router.get("/bus", function(req, res){
-    const sql = `SELECT distinct l_name, l_immediate_or_not from location 
-                 WHERE l_type = '버스터미널'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
-
-// 지역선택 - 지역
-router.get("/region", function(req, res){
-    const sql = `SELECT distinct l_name, l_immediate_or_not from location 
-                 WHERE l_type = '지역'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
-});
-
-// 지역선택 - 해외
-router.get("/abroad", function(req, res){
-    const sql = `SELECT distinct l_name, l_immediate_or_not from location 
-                 WHERE l_type = '해외'`;
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        res.send(result);
-    });
 });
 
 module.exports = router;

@@ -9,7 +9,7 @@ const affiliate = require("./routes/affiliate");
 
 app.use("/locations", location);
 app.use("/cars", car);
-app.use("/affiliate", affiliate);
+app.use("/affiliates", affiliate);
 
 // 시작
 app.get("/", function(req, res){
