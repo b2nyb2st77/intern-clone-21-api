@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const mysql = require("../../mysql");
+const mysql = require("../mysql");
 const con = mysql.init();
 
 // 모든 지역 정보 불러오기

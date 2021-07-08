@@ -3,14 +3,12 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-const location = require("./routes/location/location");
-const car_order_by_type = require("./routes/car/car_order_by_type");
-const car_order_by_price = require("./routes/car/car_order_by_price");
-const affiliate = require("./routes/affiliate/affiliate");
+const location = require("./routes/location");
+const car = require("./routes/car");
+const affiliate = require("./routes/affiliate");
 
 app.use("/locations", location);
-app.use("/cars-order-by-type", car_order_by_type);
-app.use("/cars-order-by-price", car_order_by_price);
+app.use("/cars", car);
 app.use("/affiliate", affiliate);
 
 // 시작

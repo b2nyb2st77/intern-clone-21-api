@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const mysql = require("../../mysql");
+const mysql = require("../mysql");
 const con = mysql.init();
 
 // index로 렌트카 업체 하나의 정보 불러오기
