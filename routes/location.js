@@ -1,18 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const mysql = require("../db/mysql");
 const sql_query = require("../db/location");
-const con = mysql.init();
 
 // 지역선택
 router.get("/", function(req, res){
-    const type = req.param('type');
+    const type = req.query.type;
 
     // 지역선택 - 인기 지역
     if(type == 'popular'){
-        const sql = sql_query.popular();
-
-        const execSql = con.query(sql, function(err, result){
+        const execSql =  sql_query.popular(function(err, result){
             if(err) throw err;
             res.send(result);
         });
@@ -21,9 +17,7 @@ router.get("/", function(req, res){
     }
     // 지역선택 - 공항(airport), KTX역(ktx), SRT역(srt), 버스터미널(bus), 지역(region), 해외(abroad)
     else if(type == 'airport' || type == 'ktx' || type == 'srt' || type == 'bus' || type == 'region' || type == 'abroad'){
-        const sql = sql_query.othertype();
-        
-        const execSql = con.query(sql, type, function(err, result){
+        const execSql = sql_query.othertype(type, function(err, result){
             if(err) throw err;
             res.send(result);
         });

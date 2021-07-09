@@ -1,11 +1,16 @@
 const express = require("express");
+const mysql = require("../db/mysql");
+const con = mysql.init();
 
 module.exports = {
-    one: () => {
+    findOne: (index, callback) => {
         const sql = `SELECT * 
-        FROM affiliate 
-        WHERE a_index = ?`;
+                     FROM affiliate 
+                     WHERE a_index = ?`;
         
-        return sql;
+        return con.query(sql, index, function(err, result){
+            if(err) throw err;
+            else callback(null, result);
+        });
     },
 };
