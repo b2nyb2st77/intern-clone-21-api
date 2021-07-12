@@ -89,6 +89,8 @@ module.exports = {
                     }
                     
                     break;
+                default:
+                    break;
             }
 
             return connection.query(sql, function(err, result){
@@ -104,7 +106,7 @@ module.exports = {
                      FROM car 
                      WHERE c_index = ?`;
 
-        return con.query(sql, index, function(err, result){
+        return connection.query(sql, index, function(err, result){
             if(err) callback(err);
             else callback(null, result);
         });

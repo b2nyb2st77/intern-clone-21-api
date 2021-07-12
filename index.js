@@ -3,13 +3,21 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-const location = require("./routes/location");
-const car = require("./routes/car");
-const affiliate = require("./routes/affiliate");
+const { swaggerUi, specs } = require('./swagger/swagger');
+app.use("/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
-app.use("/locations", location);
-app.use("/cars", car);
-app.use("/affiliates", affiliate);
+const location_routes = require("./routes/location");
+const cars_routes = require("./routes/car_list");
+const car_routes = require("./routes/car_one");
+const affiliate_routes = require("./routes/affiliate");
+
+app.use("/locations", location_routes);
+app.use("/cars", cars_routes);
+app.use("/car", car_routes);
+app.use("/affiliate", affiliate_routes);
 
 // 시작
 app.get("/", function(req, res){

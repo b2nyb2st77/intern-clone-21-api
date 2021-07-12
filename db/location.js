@@ -4,7 +4,7 @@ const connection = mysql.init();
 
 module.exports = {
     // 지역선택 - 인기 지역
-    findPopular: (callback) => {
+    findPopularLocations: (callback) => {
         const sql = `SELECT DISTINCT l_subname 
                      FROM location 
                      WHERE l_popular_or_not = 'y'`;
@@ -15,7 +15,7 @@ module.exports = {
         });
     },
     // 지역선택 - 공항(airport), KTX역(ktx), SRT역(srt), 버스터미널(bus), 지역(region), 해외(abroad)
-    findOtherType: (type, callback) => {
+    findByLocationType: (type, callback) => {
         const sql = `SELECT DISTINCT l_name, l_immediate_or_not 
                      FROM location
                      WHERE l_type = ?`;         
