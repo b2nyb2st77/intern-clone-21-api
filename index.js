@@ -24,5 +24,5 @@ app.use(function(res, res, next){
 
 // 서버 연결 완료
 app.listen(port, function(){
-    console.log("simple api server is open");
+    console.log("server is opened!");
 });
