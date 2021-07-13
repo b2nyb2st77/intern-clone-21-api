@@ -22,6 +22,20 @@ module.exports = {
             else if (order === 'price') {
                 sql += `ORDER BY rs.rs_price ASC`;
             }
+            // 인기순 (sql문 맞는지 점검필요)
+            else if (order == 'popular'){
+                sql += `ORDER BY FIELD(c.c_name, (SELECT c.c_name
+                                                  FROM rentcar_status rs, car c, rentcar_reservation rr
+                                                  WHERE rs.rs_c_index = c.c_index
+                                                        AND rs.rs_index = rr.rr_rs_index
+                                                        AND rr.rr_cancel_or_not = 'n'
+                                                  GROUP BY c.c_name
+                                                  ORDER BY count(c.c_name) DESC))`;
+            }
+            // 예외처리 어떻게 할지 고민해보기
+            else {
+                return "error";
+            }
 
             return connection.query(sql, function(err, result){
                 if(err) callback(err);

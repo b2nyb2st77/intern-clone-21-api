@@ -13,11 +13,13 @@ const location_routes = require("./routes/location");
 const cars_routes = require("./routes/car_list");
 const car_routes = require("./routes/car_one");
 const affiliate_routes = require("./routes/affiliate");
+const dl_routes = require("./routes/delivery_location");
 
 app.use("/locations", location_routes);
 app.use("/cars", cars_routes);
 app.use("/car", car_routes);
 app.use("/affiliate", affiliate_routes);
+app.use("/delivery_location", dl_routes);
 
 // 시작
 app.get("/", function(req, res){
