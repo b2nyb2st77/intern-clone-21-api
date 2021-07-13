@@ -4,7 +4,7 @@ const dl_repository = require("../db/delivery_location");
 
 /**
  * @swagger
- *  /delivery_location/{index}:
+ *  /delivery_location:
  *     get:
  *        tags:
  *        - delivery_location
@@ -12,22 +12,22 @@ const dl_repository = require("../db/delivery_location");
  *        produces:
  *        - applicaion/json
  *        parameters:
- *        - name: index
- *          in: path
- *          description: 업체 고유번호
+ *        - name: affiliateName
+ *          in: query
+ *          description: 업체 이름
  *          required: true
- *          type: integer
+ *          type: string
  *        responses: 
  *          200: 
  *            description: 배달가능지역 불러오기 성공
  *          404: 
  *            description: 배달가능지역 불러오기 실패
  */
-router.get("/:index", function(req, res){
-    const index = req.params.index;
+router.get("/", function(req, res){
+    const affiliateName = req.query.affiliateName;
     
-    // index로 자동차 하나의 정보 불러오기 (상세보기)
-    dl_repository.findDeliveryLocation(index, function(err, result){
+    // 업체이름으로 해당 업체의 배달가능지역 불러오기
+    dl_repository.findDeliveryLocation(affiliateName, function(err, result){
         if(err) throw err;
         res.send(result);
     });

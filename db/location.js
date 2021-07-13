@@ -25,4 +25,15 @@ module.exports = {
             else callback(null, result);
         });
     },
+    // 지역검색
+    searchLocation: (searchWord, callback) => {
+        const sql = `SELECT DISTINCT l_name, l_immediate_or_not 
+                     FROM location
+                     WHERE l_name LIKE '%` + decodeURIComponent(searchWord) + `%'`;         
+
+        return connection.query(sql, function(err, result){
+            if(err) throw err;
+            else callback(null, result);
+        });
+    },
 };
