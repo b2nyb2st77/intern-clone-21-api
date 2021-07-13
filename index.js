@@ -2,52 +2,37 @@ const { response } = require("express");
 const express = require("express");
 const app = express();
 const port = 3000;
-const mysql = require("mysql");
 
-const con = mysql.createConnection({
-    host: 'teamo2-test.c0dbvvfuggmr.ap-northeast-2.rds.amazonaws.com',
-    user: 'teamo2_intern',
-    password: 'teamo0924',
-    database: 'carmore'
-});
+const { swaggerUi, specs } = require('./swagger/swagger');
+app.use("/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
 
-con.connect(function(err){
-    if(err) throw err;
-    console.log("mysql is connected");
+const location_routes = require("./routes/location");
+const cars_routes = require("./routes/car_list");
+const car_routes = require("./routes/car_one");
+const affiliate_routes = require("./routes/affiliate");
+const dl_routes = require("./routes/delivery_location");
 
-    // con.query('CREATE DATABASE carmore', function(err, result){
-    //     if(err) throw err;
-    //     console.log('database created');
-    // })
-})
+app.use("/locations", location_routes);
+app.use("/cars", cars_routes);
+app.use("/car", car_routes);
+app.use("/affiliate", affiliate_routes);
+app.use("/delivery_location", dl_routes);
 
+// 시작
 app.get("/", function(req, res){
     res.send("Hello World!\n");
 });
 
-app.get("/cars", function(req, res){
-    const sql = "select * from car";
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        console.log(result);
-        res.send(result);
-    });
-})
-
-app.get("/locations", function(req, res){
-    const sql = "select * from location";
-    con.query(sql, function(err, result, fields){
-        if(err) throw err;
-        console.log(result);
-        res.send(result);
-    });
-})
-
+// 없는 api일 때
 app.use(function(res, res, next){
     res.status(404).send("NOT FOUND\n");
     next();
 });
 
+// 서버 연결 완료
 app.listen(port, function(){
-    console.log("simple api server is open");
+    console.log("server is opened!");
 });
