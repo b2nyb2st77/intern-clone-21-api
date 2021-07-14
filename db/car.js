@@ -2,15 +2,26 @@ const express = require("express");
 const mysql = require("../db/mysql");
 const connection = mysql.init();
 
-const init_sql = `SELECT c.*, a.*, rs.rs_price 
-                  FROM rentcar_status rs, car c, affiliate a 
-                  WHERE rs.rs_c_index = c.c_index
-                        AND rs.rs_a_index = a.a_index `;
-
 module.exports = {
     // 차량리스트 나열하기
     findCars: (order, type, location, startTime, endTime, callback) => {
-        let sql = init_sql;
+        let sql = `SELECT c.*, a.*, rs.rs_price 
+                   FROM rentcar_status rs, car c, affiliate a 
+                   WHERE rs.rs_c_index = c.c_index
+                         AND rs.rs_a_index = a.a_index `;
+
+        sql += `AND rs.rs_index NOT IN 
+                    (SELECT rs.rs_index
+                     FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
+                     WHERE rs.rs_c_index = c.c_index
+                           AND rs.rs_a_index = a.a_index
+                           AND rs.rs_index = rr.rr_rs_index
+                           AND a.a_l_index = l.l_index
+                           AND rr.rr_cancel_or_not = 'n'
+                           AND l.l_name = '` + decodeURIComponent(location) + `'
+                           AND ((rr.rr_start_time <= '` + endTime + `' AND rr.rr_end_time >= '` + endTime + `')
+                                 OR (rr.rr_start_time <= '` + startTime + `' AND rr.rr_end_time >= '` + startTime + `'))
+                    )`;
 
         // 모든 차종
         if (type == '' || type == null) {
@@ -123,6 +134,46 @@ module.exports = {
             });
         }
 
+    },
+    // 마감된 차량의 업체 개수 찾기 (차량리스트에서 한번에 할 수도 있을 것 같은데 이 점 생각해보기)
+    findNumberOfAffiliate: (carName, location, startTime, endTime, callback) => {
+        const sql = `SELECT COUNT(S.name) 
+                     FROM (SELECT a.a_name name
+                           FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
+                           WHERE c.c_name = '` + decodeURIComponent(carName) + `'
+                                 AND rs.rs_c_index = c.c_index
+                                 AND rs.rs_a_index = a.a_index
+                                 AND rs.rs_index = rr.rr_rs_index
+                                 AND a.a_l_index = l.l_index
+                                 AND rr.rr_cancel_or_not = 'n'
+                                 AND l.l_name = '` + decodeURIComponent(location) + `'
+                                 AND ((rr.rr_start_time <= '` + endTime + `' AND rr.rr_end_time >= '` + endTime + `')
+                                       OR (rr.rr_start_time <= '` + startTime + `' AND rr.rr_end_time >= '` + startTime + `'))
+                           GROUP BY a.a_name) AS S`;
+
+        return connection.query(sql, function(err, result){
+            if(err) callback(err);
+            else callback(null, result);
+        });
+    },
+    // 마감된 차량의 차량 개수 찾기 (차량리스트에서 한번에 할 수도 있을 것 같은데 이 점 생각해보기)
+    findNumberOfCar: (carName, location, startTime, endTime, callback) => {
+        const sql = `SELECT COUNT(*)
+                     FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
+                     WHERE c.c_name = '` + decodeURIComponent(carName) + `'
+                           AND rs.rs_c_index = c.c_index
+                           AND rs.rs_a_index = a.a_index
+                           AND rs.rs_index = rr.rr_rs_index
+                           AND a.a_l_index = l.l_index
+                           AND rr.rr_cancel_or_not = 'n'
+                           AND l.l_name = '` + decodeURIComponent(location) + `'
+                           AND ((rr.rr_start_time <= '` + endTime + `' AND rr.rr_end_time >= '` + endTime + `')
+                                 OR (rr.rr_start_time <= '` + startTime + `' AND rr.rr_end_time >= '` + startTime + `'))`;
+
+        return connection.query(sql, function(err, result){
+            if(err) callback(err);
+            else callback(null, result);
+        });
     },
     // 차량 하나의 정보 찾기
     findOneCar: (index, callback) => {

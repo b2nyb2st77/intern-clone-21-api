@@ -44,12 +44,14 @@ const carTypes = [
  *          in: query
  *          description: 대여시간
  *          required: true
- *          type: datetime 
+ *          type: string
+ *          format: date-time
  *        - name: endTime
  *          in: query
  *          description: 반납시간
  *          required: true
- *          type: datetime
+ *          type: string
+ *          format: date-time
  *        responses: 
  *          200: 
  *            description: 차량 리스트 불러오기 성공
