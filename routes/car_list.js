@@ -22,6 +22,23 @@ const car_repository = require("../db/car");
  *          description: 차종
  *          required: false
  *          type: string
+ *        - name: location
+ *          in: query
+ *          description: 지역
+ *          required: true
+ *          type: string
+ *        - name: startTime
+ *          in: query
+ *          description: 대여시간
+ *          required: true
+ *          type: string
+ *          format: date-time
+ *        - name: endTime
+ *          in: query
+ *          description: 반납시간
+ *          required: true
+ *          type: string
+ *          format: date-time
  *        responses: 
  *          200: 
  *            description: 차량 리스트 불러오기 성공
