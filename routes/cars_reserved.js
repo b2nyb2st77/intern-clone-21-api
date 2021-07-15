@@ -4,11 +4,11 @@ const car_repository = require("../db/car");
 
 /**
  * @swagger
- *  /find_number_of_car:
+ *  /reserved_cars:
  *     get:
  *        tags:
  *        - car
- *        description: 마감된 차량의 차량 개수 찾기
+ *        description: 마감된 차량의 업체 개수, 차량 개수 찾기
  *        produces:
  *        - applicaion/json
  *        parameters:
@@ -36,9 +36,9 @@ const car_repository = require("../db/car");
  *          format: date-time
  *        responses: 
  *          200: 
- *            description: 마감된 차량의 차량 개수 찾기 성공
+ *            description: 마감된 차량의 업체 개수, 차량 개수 찾기 성공
  *          404: 
- *            description: 마감된 차량의 차량 개수 찾기 실패
+ *            description: 마감된 차량의 업체 개수, 차량 개수 찾기 실패
  */
 router.get("/", function(req, res){
     const carName = req.query.carName;
@@ -46,7 +46,7 @@ router.get("/", function(req, res){
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
 
-    car_repository.findNumberOfCar(carName, location, startTime, endTime, function(err, result){
+    car_repository.findReservedCars(carName, location, startTime, endTime, function(err, result){
         if(err) throw err;
         res.send(result);
     });
