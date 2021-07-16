@@ -50,18 +50,26 @@ router.get("/", function(req, res){
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
 
+    const re = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
 
-    // 전체, 전기(elec), 경소형(small), 준중형(middle), SUV(suv), 승합(rv), 수입(import)
-    if (type == '' || type == null || type === 'elec' || type === 'small' || type === 'middle' || type === 'big' || type === 'suv' || type === 'rv' || type === 'import') {
-        car_repository.findCars(order, type, location, startTime, endTime, function(err, result){
-            if(err) throw err;
-            res.send(result);
-        });
+    if (re.test(startTime) && re.test(endTime)) {
+        // 전체, 전기(elec), 경소형(small), 준중형(middle), SUV(suv), 승합(rv), 수입(import)
+        if (type == '' || type == null || type === 'elec' || type === 'small' || type === 'middle' || type === 'big' || type === 'suv' || type === 'rv' || type === 'import') {
+            car_repository.findCars(order, type, location, startTime, endTime, function(err, result){
+                if(err) throw err;
+                res.send(result);
+            });
+        }
+        // 다른 것을 입력했을 경우 예외 처리
+        else {
+            res.status(404).send("NOT FOUND\n");
+        }
     }
-    // 다른 것을 입력했을 경우 예외 처리
     else {
         res.status(404).send("NOT FOUND\n");
     }
+
+
 
 });
 
