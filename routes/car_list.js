@@ -1,6 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const car_repository = require("../db/car");
+const response_handler = require("../core/responseHandler");
+const validate = require("../core/validate");
+
+const carTypes = [
+    '',
+    'elec',
+    'small',
+    'middle',
+    'big',
+    'suv',
+    'rv',
+    'import',
+];
 
 /**
  * @swagger
@@ -45,32 +58,51 @@ const car_repository = require("../db/car");
  */
 router.get("/", function(req, res){
     const order = req.query.order;
-    const type = req.query.type;
+    let type = req.query.type;
     const location = req.query.location;
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
 
-    const re = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
-
-    if (re.test(startTime) && re.test(endTime)) {
-        // 전체, 전기(elec), 경소형(small), 준중형(middle), SUV(suv), 승합(rv), 수입(import)
-        if (type == '' || type == null || type === 'elec' || type === 'small' || type === 'middle' || type === 'big' || type === 'suv' || type === 'rv' || type === 'import') {
-            car_repository.findCars(order, type, location, startTime, endTime, function(err, result){
-                if(err) throw err;
-                res.send(result);
-            });
-        }
-        // 다른 것을 입력했을 경우 예외 처리
-        else {
-            res.status(404).send("NOT FOUND\n");
-        }
-    }
-    else {
-        res.status(404).send("NOT FOUND\n");
+    if (!validate.checkInjection(order) || !validate.checkInjection(type) || !validate.checkInjection(location) || !validate.checkInjection(startTime) ||!validate.checkInjection(endTime)) {
+        response_handler.response406Error(res);
+        return;
     }
 
+    if(validate.isEmpty(type)){
+        type = '';
+    }
 
+    if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
+        response_handler.response501Error(res);
+        return;
+    }
+    
+    if (!(order === "type" || order === "price")) {
+        response_handler.response501Error(res);
+        return;
+    }
+    
+    if (!~carTypes.indexOf(type)) {
+        response_handler.response501Error(res);
+        return;
+    }
+    
+    if (!validate.validateRequestDatetime(startTime, endTime)) {
+        response_handler.response501Error(res);
+        return;
+    }
 
+    car_repository.findCars(
+        order,
+        type,
+        location,
+        startTime,
+        endTime,
+        function(err, result){
+            if(err) throw err;
+            res.send(result);
+        },
+    );
 });
 
 module.exports = router;

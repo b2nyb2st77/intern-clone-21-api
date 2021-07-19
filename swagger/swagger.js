@@ -3,10 +3,12 @@ const swaggereJsdoc = require('swagger-jsdoc');
 
 const options = {
     swaggerDefinition: {
+        components: {},
+        definitions: {},
         info: {
-            title: 'Test API',
+            title: 'Carmore API',
             version: '1.0.0',
-            description: 'Test API carmore',
+            description: 'Test API of Carmore',
         },
         host: 'localhost:3000',
         basePath: '/'

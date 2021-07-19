@@ -32,10 +32,6 @@ module.exports = {
             //                                       GROUP BY c.c_name
             //                                       ORDER BY count(c.c_name) DESC))`;
             // }
-            // 예외처리 어떻게 할지 고민해보기
-            else {
-                return "error";
-            }
 
             return connection.query(sql, function(err, result){
                 if(err) callback(err);
