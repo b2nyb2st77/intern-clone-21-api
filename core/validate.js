@@ -24,20 +24,12 @@ module.exports = {
                 return false; 
             }
 
-            const sqlArray = new Array( 
-                "OR", "SELECT", "INSERT", "DELETE", "UPDATE", "CREATE", "DROP", "EXEC", "UNION", "FETCH", "DECLARE", "TRUNCATE" 
-            ); 
-            
-            let regex;
+            const sqlRegExp = /(OR)+|(SELECT)+|(INSERT)+|(DELETE)+|(UPDATE)+|(CREATE)+|(DROP)+|(EXEC)+|(UNION)+|(FETCH)+|(DECLARE)+|(TRUNCATE)+/;
 
-            for (let i = 0; i < sqlArray.length; i++) {
-                regex = new RegExp(sqlArray[i], "gi");
+            if (sqlRegExp.test(obj)) { 
+                return false; 
+            }
 
-                if (regex.test(obj)) { 
-                    obj = obj.replace(regex, "");
-                    return false; 
-                }
-            } 
         } 
         
         return true;

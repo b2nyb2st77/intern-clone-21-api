@@ -26,7 +26,7 @@ module.exports = {
     searchLocation: (searchWord, callback) => {
         const sql = `SELECT DISTINCT l_name, l_immediate_or_not 
                      FROM location
-                     WHERE l_name LIKE '%` + decodeURIComponent(searchWord) + `%'`;         
+                     WHERE l_name LIKE '%` + searchWord + `%'`;         
 
         return connection.query(sql, function(err, result){
             if(err) throw err;

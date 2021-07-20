@@ -24,7 +24,7 @@ const validate = require("../core/validate");
  *          200: 
  *            description: 지역 리스트 검색하기 성공
  *            schema:
- *              $ref: '#/definitions/Location_type_list'
+ *              $ref: '#/definitions/Location_list'
  *            example:
  *              l_name: '서울역'
  *              l_immediate_or_not: 'y'
@@ -51,7 +51,7 @@ const validate = require("../core/validate");
  *         description: 인기지역 이름
  */
 router.get("/", function(req, res){
-    const searchWord = req.query.searchWord;
+    const searchWord = decodeURIComponent(req.query.searchWord);
 
     if (!validate.checkInjection(searchWord)) {
         response_handler.response406Error(res);

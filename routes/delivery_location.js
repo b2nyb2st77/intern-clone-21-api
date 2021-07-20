@@ -49,7 +49,7 @@ const validate = require("../core/validate");
  * 
  */
 router.get("/", function(req, res){
-    const affiliateName = req.query.affiliateName;
+    const affiliateName = decodeURIComponent(req.query.affiliateName);
 
     if (!validate.checkInjection(affiliateName)) {
         response_handler.response406Error(res);
