@@ -18,20 +18,12 @@ module.exports = {
     checkInjection: (obj) => { 
         if (obj.length > 0) {
             const expText = /[%=><]/;
-
-            if (expText.test(obj) == true) { 
-                obj.value = obj.value.split(expText).join(""); 
-                return false; 
-            }
+            if (expText.test(obj)) return false; 
 
             const sqlRegExp = /(OR)+|(SELECT)+|(INSERT)+|(DELETE)+|(UPDATE)+|(CREATE)+|(DROP)+|(EXEC)+|(UNION)+|(FETCH)+|(DECLARE)+|(TRUNCATE)+/;
+            if (sqlRegExp.test(obj)) return false;
+        }
 
-            if (sqlRegExp.test(obj)) { 
-                return false; 
-            }
-
-        } 
-        
         return true;
     }
 };
