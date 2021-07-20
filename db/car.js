@@ -9,7 +9,7 @@ const init_sql = `SELECT c.*, a.*, rs.rs_price
 
 module.exports = {
     // 차량리스트 나열하기
-    findCars: (order, type, callback) => {
+    findCars: (order, type, location, startTime, endTime, callback) => {
         let sql = init_sql;
 
         // 모든 차종
@@ -22,20 +22,16 @@ module.exports = {
             else if (order === 'price') {
                 sql += `ORDER BY rs.rs_price ASC`;
             }
-            // 인기순 (sql문 맞는지 점검필요)
-            else if (order == 'popular'){
-                sql += `ORDER BY FIELD(c.c_name, (SELECT c.c_name
-                                                  FROM rentcar_status rs, car c, rentcar_reservation rr
-                                                  WHERE rs.rs_c_index = c.c_index
-                                                        AND rs.rs_index = rr.rr_rs_index
-                                                        AND rr.rr_cancel_or_not = 'n'
-                                                  GROUP BY c.c_name
-                                                  ORDER BY count(c.c_name) DESC))`;
-            }
-            // 예외처리 어떻게 할지 고민해보기
-            else {
-                return "error";
-            }
+            // 인기순
+            // else if (order == 'popular'){
+            //     sql += `ORDER BY FIELD(c.c_name, (SELECT c.c_name
+            //                                       FROM rentcar_status rs, car c, rentcar_reservation rr
+            //                                       WHERE rs.rs_c_index = c.c_index
+            //                                             AND rs.rs_index = rr.rr_rs_index
+            //                                             AND rr.rr_cancel_or_not = 'n'
+            //                                       GROUP BY c.c_name
+            //                                       ORDER BY count(c.c_name) DESC))`;
+            // }
 
             return connection.query(sql, function(err, result){
                 if(err) callback(err);
@@ -106,6 +102,20 @@ module.exports = {
                 default:
                     break;
             }
+
+            // 고민할 것
+            sql += `EXCEPT (SELECT c.*, a.*, rs.rs_price
+                            FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
+                            WHERE rs.rs_c_index = c.c_index
+                                  AND rs.rs_a_index = a.a_index
+                                  AND rs.rs_index = rr.rr_rs_index
+                                  AND a.a_l_index = l.l_index
+                                  AND rr.rr_cancel_or_not = 'n'
+                                  AND l.l_name = '` + decodeURIComponent(location) + `'
+                                  AND ((rr.rr_start_time < ` + endTime + ` AND rr.rr_end_time > ` + endTime + `)
+                                        OR (rr.rr_start_time < ` + startTime + ` AND rr.rr_end_time > ` + startTime + `))
+                            )
+                    `;
 
             return connection.query(sql, function(err, result){
                 if(err) callback(err);
