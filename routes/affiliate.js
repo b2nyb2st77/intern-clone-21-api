@@ -6,7 +6,8 @@ const validate = require("../core/validate");
 
 /**
  * @swagger
- *  /affiliate/{index}:
+ * paths:
+ *   /affiliate/{index}:
  *     get:
  *        tags:
  *        - affiliate
@@ -74,7 +75,6 @@ const validate = require("../core/validate");
  *         type: string
  *         enum: [y, n]
  *         description: 신규등록업체 유무
- * 
  */
 router.get("/:index", function(req, res){
     const index = req.params.index;

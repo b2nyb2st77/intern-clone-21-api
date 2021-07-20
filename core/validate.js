@@ -2,11 +2,13 @@ const express = require("express");
 
 module.exports = {
     validateRequestInteger: (index) => {
-        if(isNaN(index)) return false;
-        else if(index <= 0) return false;
+        if (isNaN(index)) return false;
+        else if (index <= 0) return false;
         else return true;
     },
     validateRequestDatetime: (startTime, endTime) => {
+        if (startTime >= endTime) return false;
+
         const regexp = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
         return regexp.test(startTime) && regexp.test(endTime);
     },

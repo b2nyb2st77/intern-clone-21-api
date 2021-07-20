@@ -17,7 +17,7 @@ const locationTypes = [
 /**
  * @swagger
  * paths:
- *  /locations:
+ *   /locations:
  *     get:
  *        tags:
  *        - location

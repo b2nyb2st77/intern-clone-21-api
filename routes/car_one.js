@@ -6,7 +6,8 @@ const validate = require("../core/validate");
 
 /**
  * @swagger
- *  /car/{index}:
+ * paths:
+ *   /car/{index}:
  *     get:
  *        tags:
  *        - car
@@ -39,6 +40,10 @@ const validate = require("../core/validate");
  *              c_driver_age: 21
  *          404: 
  *            description: 차량 정보 불러오기 실패
+ *          406: 
+ *            description: sql injection 발생
+ *          501: 
+ *            description: index값 오류
  * 
  * definitions:
  *   Car_one:

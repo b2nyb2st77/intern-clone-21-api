@@ -3,25 +3,22 @@ const mysql = require("../db/mysql");
 const connection = mysql.init();
 
 module.exports = {
-    // 차량리스트 나열하기
     findCars: (order, type, location, startTime, endTime, callback) => {
         let sql = `SELECT c.*, a.*, rs.rs_price 
                    FROM rentcar_status rs, car c, affiliate a 
                    WHERE rs.rs_c_index = c.c_index
-                         AND rs.rs_a_index = a.a_index `;
-
-        sql += `AND rs.rs_index NOT IN 
-                    (SELECT rs.rs_index
-                     FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
-                     WHERE rs.rs_c_index = c.c_index
-                           AND rs.rs_a_index = a.a_index
-                           AND rs.rs_index = rr.rr_rs_index
-                           AND a.a_l_index = l.l_index
-                           AND rr.rr_cancel_or_not = 'n'
-                           AND l.l_name = '` + decodeURIComponent(location) + `'
-                           AND ((rr.rr_start_time <= '` + endTime + `' AND rr.rr_end_time >= '` + endTime + `')
-                                 OR (rr.rr_start_time <= '` + startTime + `' AND rr.rr_end_time >= '` + startTime + `'))
-                    )`;
+                         AND rs.rs_a_index = a.a_index
+                         AND rs.rs_index NOT IN (SELECT rs.rs_index
+                                                 FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
+                                                 WHERE rs.rs_c_index = c.c_index
+                                                       AND rs.rs_a_index = a.a_index
+                                                       AND rs.rs_index = rr.rr_rs_index
+                                                       AND a.a_l_index = l.l_index
+                                                       AND rr.rr_cancel_or_not = 'n'
+                                                       AND l.l_name = '${location}'
+                                                       AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
+                                                             OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'))
+                                                )`;
 
         // 모든 차종
         if (type == '' || type == null) {
@@ -37,7 +34,7 @@ module.exports = {
                                                   GROUP BY c.c_name
                                                   ORDER BY min(rs.rs_price) ASC))`;
             }
-            // // 인기순 (sql문 맞는지 점검필요)
+            // 인기순 (추가개발)
             // else if (order == 'popular'){
             //     sql += `ORDER BY FIELD(c.c_name, (SELECT c.c_name
             //                                       FROM rentcar_status rs, car c, rentcar_reservation rr
@@ -47,10 +44,6 @@ module.exports = {
             //                                       GROUP BY c.c_name
             //                                       ORDER BY count(c.c_name) DESC))`;
             // }
-            // 예외처리 어떻게 할지 고민해보기
-            else {
-                return "error";
-            }
 
             return connection.query(sql, function(err, result){
                 if(err) callback(err);
@@ -63,78 +56,50 @@ module.exports = {
                 case 'elec':
                     sql += `AND c.c_fuel = '전기'`;
                     
-                    if (order === 'price') {
-                        sql += ` ORDER BY rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
                     
                     break;
                 case 'small':
                     sql += `AND c.c_type IN ('경형', '소형')
                             ORDER BY FIELD(c.c_type, '경형', '소형')`;
 
-                    if (order === 'price') {
-                        sql += `, rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += `, rs.rs_price ASC`;
 
                     break;
                 case 'middle':
                     sql += `AND c.c_type = '준중형'`
                                         
-                    if (order === 'price') {
-                        sql += ` ORDER BY rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
                     
                     break;
                 case 'big':
                     sql += `AND c.c_type IN ('중형', '대형')
                             ORDER BY FIELD(c.c_type, '중형', '대형')`;
 
-                    if (order === 'price') {
-                        sql += `, rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += `, rs.rs_price ASC`;
 
                     break;
                 case 'suv':
                     sql += `AND c.c_type = 'SUV'`
                                         
-                    if (order === 'price') {
-                        sql += ` ORDER BY rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
                     
                     break;
                 case 'rv':
                     sql += `AND c.c_type = 'RV'`
                                         
-                    if (order === 'price') {
-                        sql += ` ORDER BY rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
                     
                     break;
                 case 'import':
                     sql += `AND c.c_type = '수입'`
                                         
-                    if (order === 'price') {
-                        sql += ` ORDER BY rs.rs_price ASC`;
-                    }
+                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
                     
                     break;
                 default:
                     break;
             }
-
-            // 고민할 것
-            sql += `EXCEPT (SELECT c.*, a.*, rs.rs_price
-                            FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
-                            WHERE rs.rs_c_index = c.c_index
-                                  AND rs.rs_a_index = a.a_index
-                                  AND rs.rs_index = rr.rr_rs_index
-                                  AND a.a_l_index = l.l_index
-                                  AND rr.rr_cancel_or_not = 'n'
-                                  AND l.l_name = '` + decodeURIComponent(location) + `'
-                                  AND ((rr.rr_start_time < ` + endTime + ` AND rr.rr_end_time > ` + endTime + `)
-                                        OR (rr.rr_start_time < ` + startTime + ` AND rr.rr_end_time > ` + startTime + `))
-                            )
-                    `;
 
             return connection.query(sql, function(err, result){
                 if(err) callback(err);
@@ -144,39 +109,38 @@ module.exports = {
 
     },
     // 마감된 차량의 업체 개수, 차량 개수 찾기 (차량리스트에서 한번에 할 수도 있을 것 같은데 이 점 생각해보기)
-    findReservedCars: (carName, location, startTime, endTime, callback) => {
+    findReservedCar: (carName, location, startTime, endTime, callback) => {
         const sql1 = `SELECT COUNT(S.name) number_of_affiliate
                       FROM (SELECT a.a_name name
                             FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
-                            WHERE c.c_name = '` + decodeURIComponent(carName) + `'
+                            WHERE c.c_name = '${carName}'
                                   AND rs.rs_c_index = c.c_index
                                   AND rs.rs_a_index = a.a_index
                                   AND rs.rs_index = rr.rr_rs_index
                                   AND a.a_l_index = l.l_index
                                   AND rr.rr_cancel_or_not = 'n'
-                                  AND l.l_name = '` + decodeURIComponent(location) + `'
-                                  AND ((rr.rr_start_time <= '` + endTime + `' AND rr.rr_end_time >= '` + endTime + `')
-                                        OR (rr.rr_start_time <= '` + startTime + `' AND rr.rr_end_time >= '` + startTime + `'))
+                                  AND l.l_name = '${location}'
+                                  AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
+                                        OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'))
                             GROUP BY a.a_name) AS S;`;
                             
         const sql2 = `SELECT COUNT(*) number_of_car
                       FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
-                      WHERE c.c_name = '` + decodeURIComponent(carName) + `'
+                      WHERE c.c_name = '${carName}'
                             AND rs.rs_c_index = c.c_index
                             AND rs.rs_a_index = a.a_index
                             AND rs.rs_index = rr.rr_rs_index
                             AND a.a_l_index = l.l_index
                             AND rr.rr_cancel_or_not = 'n'
-                            AND l.l_name = '` + decodeURIComponent(location) + `'
-                            AND ((rr.rr_start_time <= '` + endTime + `' AND rr.rr_end_time >= '` + endTime + `')
-                                  OR (rr.rr_start_time <= '` + startTime + `' AND rr.rr_end_time >= '` + startTime + `'));`;
+                            AND l.l_name = '${location}'
+                            AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
+                                  OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'));`;
 
         return connection.query(sql1 + sql2, function(err, result){
             if(err) callback(err);
             else callback(null, result);
         });
     },
-    // 차량 하나의 정보 찾기
     findOneCar: (index, callback) => {
         const sql = `SELECT * 
                      FROM car 

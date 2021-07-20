@@ -6,7 +6,8 @@ const validate = require("../core/validate");
 
 /**
  * @swagger
- *  /delivery_location:
+ * paths:
+ *   /delivery_location:
  *     get:
  *        tags:
  *        - delivery_location
@@ -46,7 +47,6 @@ const validate = require("../core/validate");
  *       dl_gu:
  *         type: string
  *         description: 지역 구
- * 
  */
 router.get("/", function(req, res){
     const affiliateName = decodeURIComponent(req.query.affiliateName);
