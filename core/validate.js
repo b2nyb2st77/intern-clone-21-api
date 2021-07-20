@@ -2,9 +2,7 @@ const express = require("express");
 
 module.exports = {
     validateRequestInteger: (index) => {
-        if (isNaN(index)) return false;
-        else if (index <= 0) return false;
-        else return true;
+        return !(isNaN(index) || index <= 0) ? true : false;
     },
     validateRequestDatetime: (startTime, endTime) => {
         if (startTime >= endTime) return false;

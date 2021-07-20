@@ -56,7 +56,7 @@ router.get("/", function(req, res){
         return;
     }
 
-    if (validate.isEmpty(affiliateName)) {
+    if (validate.isEmpty(affiliateName, "PARAMETER IS EMPTY")) {
         response_handler.response501Error(res);
         return;
     }

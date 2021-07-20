@@ -190,22 +190,22 @@ router.get("/", function(req, res){
     if(validate.isEmpty(type)) type = '';
 
     if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "PARAMETER IS EMPTY");
         return;
     }
     
     if (!(order === "type" || order === "price")) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "ORDER DOES NOT MATCH");
         return;
     }
     
     if (!~carTypes.indexOf(type)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "TYPE DOES NOT MATCH");
         return;
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "VALIDATION CHECK FAIL");
         return;
     }
 

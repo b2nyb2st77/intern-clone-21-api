@@ -66,12 +66,12 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(type)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "PARAMETER IS EMPTY");
         return;
     }
 
     if (!~locationTypes.indexOf(type)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "TYPE DOES NOT MATCH");
         return;
     }
     

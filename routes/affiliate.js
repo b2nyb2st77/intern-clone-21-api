@@ -85,12 +85,12 @@ router.get("/:index", function(req, res){
     }
 
     if (validate.isEmpty(index)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "PARAMETER IS EMPTY");
         return;
     }
     
     if (!validate.validateRequestInteger(index)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "VALIDATION CHECK FAIL");
         return;
     }
 

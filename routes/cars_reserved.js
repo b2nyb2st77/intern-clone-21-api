@@ -77,12 +77,12 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(carName) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "PARAMETER IS EMPTY");
         return;
     }
 
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "VALIDATION CHECK FAIL");
         return;
     }
 
