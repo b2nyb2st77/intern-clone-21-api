@@ -8,12 +8,10 @@ module.exports = {
     },
     validateRequestDatetime: (startTime, endTime) => {
         const regexp = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
-
         return regexp.test(startTime) && regexp.test(endTime);
     },
     isEmpty: (str) => {
-        if (typeof str == "undefined" || str == null || str == "") return true;
-        else return false;
+        return (typeof str == "undefined" || str == null || str == "") ? true : false;
     },
     checkInjection: (obj) => { 
         if (obj.length > 0) {
