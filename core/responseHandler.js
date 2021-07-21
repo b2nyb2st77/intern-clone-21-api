@@ -2,12 +2,16 @@ const express = require("express");
 
 module.exports = {
     response404Error: (res) => {
-        res.status(404).send("NOT FOUND\n");
+        const code = "NOT FOUND";
+        res.status(404).send({code: code});
     },
     response501Error: (res, msg) => {
-        res.status(501).send("501 ERROR\n" + msg);
+        const code = "501 ERROR";
+        const errorMsg = msg;
+        res.status(501).send({code: code, errorMessage: errorMsg});
     },
     response406Error: (res) => {
-        res.status(406).send("INJECTION ERROR\n");
+        const code = "INJECTION ERROR";
+        res.status(406).send({code: code});
     },
 };

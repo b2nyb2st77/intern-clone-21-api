@@ -47,10 +47,23 @@ const validate = require("../core/validate");
  *              number_of_car: 3
  *          404: 
  *            description: 마감된 차량의 업체 개수, 차량 개수 찾기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: 파라미터값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * definitions:
  *   Car_reserved:
  *     type: object
@@ -92,8 +105,8 @@ router.get("/", function(req, res){
         startTime, 
         endTime, 
         function(err, result){
-        if(err) throw err;
-        res.send(result);
+        if (err) res.send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
     });
 
 });

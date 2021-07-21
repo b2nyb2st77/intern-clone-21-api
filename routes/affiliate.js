@@ -35,10 +35,23 @@ const validate = require("../core/validate");
  *              a_new_or_not: 'n'
  *          404: 
  *            description: 업체 정보 불러오기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: index값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * 
  * definitions:
  *   Affiliate_one:
@@ -95,8 +108,8 @@ router.get("/:index", function(req, res){
     }
 
     affiliate_repository.findOneAffiliate(index, function(err, result){
-        if(err) throw err;
-        res.send(result);
+        if (err) res.send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
     })
 });
 

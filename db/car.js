@@ -20,95 +20,110 @@ module.exports = {
                                                              OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'))
                                                 )`;
 
-        // 모든 차종
-        if (type == '' || type == null) {
-            // 차종순
-            if (order === 'type') {
-                sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV')`;
-            }
-            // 가격순 (SQL문 다르게 표현하는 거 생각해보기)
-            else if (order === 'price') {
-                sql += `ORDER BY FIELD(c.c_name, (SELECT c.c_name 
-                                                  FROM rentcar_status rs, car c 
-                                                  WHERE rs.rs_c_index = c.c_index
-                                                  GROUP BY c.c_name
-                                                  ORDER BY min(rs.rs_price) ASC))`;
-            }
-            // 인기순 (추가개발)
-            // else if (order == 'popular'){
-            //     sql += `ORDER BY FIELD(c.c_name, (SELECT c.c_name
-            //                                       FROM rentcar_status rs, car c, rentcar_reservation rr
-            //                                       WHERE rs.rs_c_index = c.c_index
-            //                                             AND rs.rs_index = rr.rr_rs_index
-            //                                             AND rr.rr_cancel_or_not = 'n'
-            //                                       GROUP BY c.c_name
-            //                                       ORDER BY count(c.c_name) DESC))`;
-            // }
-
-            return connection.query(sql, function(err, result){
-                if(err) callback(err);
-                else callback(null, result);
-            });
-        }
-        // 전기(elec), 경소형(small), 준중형(middle), SUV(suv), 승합(rv), 수입(import)
-        else {
+        if (order === 'type') {
             switch (type) {
+                case '':
+                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV')`;
+                    break;
+                case null:
+                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV')`;
+                    break;
                 case 'elec':
-                    sql += `AND c.c_fuel = '전기'`;
-                    
-                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
-                    
+                    sql += `AND c.c_fuel = '전기'
+                            ORDER BY c.c_name ASC`;
                     break;
                 case 'small':
                     sql += `AND c.c_type IN ('경형', '소형')
-                            ORDER BY FIELD(c.c_type, '경형', '소형')`;
-
-                    if (order === 'price') sql += `, rs.rs_price ASC`;
-
+                            ORDER BY FIELD(c.c_type, '경형', '소형'), c.c_name ASC`;
                     break;
                 case 'middle':
-                    sql += `AND c.c_type = '준중형'`
-                                        
-                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
-                    
+                    sql += `AND c.c_type = '준중형'
+                            ORDER BY c.c_name ASC`;
                     break;
                 case 'big':
                     sql += `AND c.c_type IN ('중형', '대형')
-                            ORDER BY FIELD(c.c_type, '중형', '대형')`;
-
-                    if (order === 'price') sql += `, rs.rs_price ASC`;
-
+                            ORDER BY FIELD(c.c_type, '중형', '대형'), c.c_name ASC`;
                     break;
                 case 'suv':
-                    sql += `AND c.c_type = 'SUV'`
-                                        
-                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
-                    
+                    sql += `AND c.c_type = 'SUV'
+                            ORDER BY c.c_name ASC`;
                     break;
                 case 'rv':
-                    sql += `AND c.c_type = 'RV'`
-                                        
-                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
-                    
+                    sql += `AND c.c_type = 'RV'
+                            ORDER BY c.c_name ASC`;
                     break;
                 case 'import':
-                    sql += `AND c.c_type = '수입'`
-                                        
-                    if (order === 'price') sql += ` ORDER BY rs.rs_price ASC`;
-                    
+                    sql += `AND c.c_type = '수입'
+                            ORDER BY c.c_name ASC`;
                     break;
                 default:
                     break;
             }
+        }
+        else if (order === 'price') {
+            const sql_price = `ORDER BY FIELD(c.c_name, (SELECT group_concat(S.name) 
+                                                         FROM (SELECT c.c_name name
+                                                               FROM rentcar_status rs, car c 
+                                                               WHERE rs.rs_c_index = c.c_index`;
 
-            return connection.query(sql, function(err, result){
-                if(err) callback(err);
-                else callback(null, result);
-            });
+            switch (type) {
+                case '':
+                    sql += sql_price;
+                    break;
+                case null:
+                    sql += sql_price;
+                    break;
+                case 'elec':
+                    sql += ` AND c.c_fuel = '전기' `
+                           + sql_price
+                           + ` AND c.c_fuel = '전기' `;
+                    break;
+                case 'small':
+                    sql += ` AND c.c_type IN ('경형', '소형') `
+                            + sql_price
+                            + ` AND c.c_type IN ('경형', '소형') `;
+                    break;
+                case 'middle':
+                    sql += ` AND c.c_type = '준중형' `
+                            + sql_price
+                            + ` AND c.c_type = '준중형' `;
+                    break;
+                case 'big':
+                    sql += ` AND c.c_type IN ('중형', '대형') `
+                            + sql_price
+                            + ` AND c.c_type IN ('중형', '대형') `;
+                    break;
+                case 'suv':
+                    sql += ` AND c.c_type = 'SUV' `
+                            + sql_price
+                            + ` AND c.c_type = 'SUV' `;
+                    break;
+                case 'rv':
+                    sql += ` AND c.c_type = 'RV' `
+                            + sql_price
+                            + ` AND c.c_type = 'RV' `;
+                    break;
+                case 'import':
+                    sql += ` AND c.c_type = '수입' `
+                            + sql_price
+                            + ` AND c.c_type = '수입' `;
+                    break;
+                default:
+                    break;
+            }
+            
+            sql +=  `GROUP BY c.c_name
+                     ORDER BY min(rs.rs_price) ASC
+                     ) AS S)), rs.rs_price ASC`;
         }
 
+        return connection.query(sql, function(err, result){
+            if(err) callback(err);
+            else callback(null, result);
+        });
+
     },
-    // 마감된 차량의 업체 개수, 차량 개수 찾기 (차량리스트에서 한번에 할 수도 있을 것 같은데 이 점 생각해보기)
+    // 마감된 차량의 업체 개수, 차량 개수 찾기
     findReservedCar: (carName, location, startTime, endTime, callback) => {
         const sql1 = `SELECT COUNT(S.name) number_of_affiliate
                       FROM (SELECT a.a_name name

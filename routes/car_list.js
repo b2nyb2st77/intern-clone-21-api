@@ -81,10 +81,23 @@ const carTypes = [
  *              rs_price: 55000
  *          404: 
  *            description: 차량 리스트 불러오기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: 파라미터값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * 
  * definitions:
  *   Car_list:
@@ -182,12 +195,12 @@ router.get("/", function(req, res){
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
 
+    if(validate.isEmpty(type)) type = '';
+
     if (!validate.checkInjection(order) || !validate.checkInjection(type) || !validate.checkInjection(location) || !validate.checkInjection(startTime) ||!validate.checkInjection(endTime)) {
         response_handler.response406Error(res);
         return;
     }
-
-    if(validate.isEmpty(type)) type = '';
 
     if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
         response_handler.response501Error(res, "PARAMETER IS EMPTY");
@@ -216,8 +229,8 @@ router.get("/", function(req, res){
         startTime,
         endTime,
         function(err, result){
-            if(err) throw err;
-            res.send(result);
+            if (err) res.send({code: "SQL ERROR", errorMessage: err});
+            else res.send(result);
         },
     );
 });

@@ -30,10 +30,23 @@ const validate = require("../core/validate");
  *              dl_gu: '강남구'
  *          404: 
  *            description: 배달가능지역 불러오기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: affiliateName값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * definitions:
  *   Delivery_location_list:
  *     type: object
@@ -62,8 +75,8 @@ router.get("/", function(req, res){
     }
     
     dl_repository.findDeliveryLocation(affiliateName, function(err, result){
-        if(err) throw err;
-        res.send(result);
+        if (err) res.send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
     });
 });
 

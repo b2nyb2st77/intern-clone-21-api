@@ -30,10 +30,23 @@ const validate = require("../core/validate");
  *              l_immediate_or_not: 'y'
  *          404: 
  *            description: 지역 리스트 검색하기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: searchWord값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * 
  * definitions:
  *   Location_list:
@@ -49,6 +62,34 @@ const validate = require("../core/validate");
  *       l_subname:
  *         type: string
  *         description: 인기지역 이름
+ *   Error_404:
+ *     type: object
+ *     required:
+ *       - code
+ *     properties:
+ *       code:
+ *         type: string
+ *         description: 오류 코드
+ *   Error_406:
+ *     type: object
+ *     required:
+ *       - code
+ *     properties:
+ *       code:
+ *         type: string
+ *         description: 오류 코드
+ *   Error_501:
+ *     type: object
+ *     required:
+ *       - code
+ *       - errorMessage
+ *     properties:
+ *       code:
+ *         type: string
+ *         description: 오류 코드
+ *       errorMessage:
+ *         type: string
+ *         description: 오류 내용
  */
 router.get("/", function(req, res){
     const searchWord = decodeURIComponent(req.query.searchWord);
@@ -64,8 +105,8 @@ router.get("/", function(req, res){
     }
 
     location_repository.searchLocation(searchWord, function(err, result){
-        if(err) throw err;
-        res.send(result);
+        if (err) res.send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
     });
 
 });
