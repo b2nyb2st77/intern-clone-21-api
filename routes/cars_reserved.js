@@ -93,8 +93,18 @@ router.get("/", function(req, res){
         response_handler.response501Error(res, "PARAMETER IS EMPTY");
         return;
     }
+    
+    const validateDate = validate.validateRequestDatetime(startTime, endTime);
 
-    if (!validate.validateRequestDatetime(startTime, endTime)) {
+    if (validateDate == "over_time") {
+        response_handler.response501Error(res, "END TIME SHOULD BE QUICKER THAN START TIME");
+        return;
+    }
+    else if (validateDate == "time_difference") {
+        response_handler.response501Error(res, "END TIME SHOULD BE MORE THAN 24 HOURS LATER THAN START TIME");
+        return;
+    }
+    else if (validate.validateRequestDatetime(startTime, endTime) == false) {
         response_handler.response501Error(res, "VALIDATION CHECK FAIL");
         return;
     }

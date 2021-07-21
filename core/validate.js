@@ -5,10 +5,16 @@ module.exports = {
         return !(isNaN(index) || index <= 0) ? true : false;
     },
     validateRequestDatetime: (startTime, endTime) => {
-        if (startTime >= endTime) return false;
-
-        const regexp = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
-        return regexp.test(startTime) && regexp.test(endTime);
+        const start = new Date(startTime).getTime();
+        const end = new Date(endTime).getTime();
+        const timeDiff = Math.floor((end - start) / 3600000);
+        
+        if (startTime >= endTime) return "over_time";
+        else if (timeDiff < 24) return "time_difference";
+        else {
+            const regexp = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
+            return regexp.test(startTime) && regexp.test(endTime);
+        }
     },
     isEmpty: (str) => {
         return (typeof str == "undefined" || str == null || str == "") ? true : false;
