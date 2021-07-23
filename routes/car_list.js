@@ -197,7 +197,7 @@ router.get("/", function(req, res){
 
     if(validate.isEmpty(type)) type = '';
 
-    if (!validate.checkInjection(order) || !validate.checkInjection(type) || !validate.checkInjection(location) || !validate.checkInjection(startTime) ||!validate.checkInjection(endTime)) {
+    if (!validate.checkInjection(order) || !validate.checkInjection(type) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
         response_handler.response406Error(res);
         return;
     }
@@ -217,17 +217,16 @@ router.get("/", function(req, res){
         return;
     }
 
-    const validateDate = validate.validateRequestDatetime(startTime, endTime);
-
-    if (validateDate == "over_time") {
+    if (validate.checkTime(startTime, endTime) == "over_time") {
         response_handler.response501Error(res, "END TIME SHOULD BE QUICKER THAN START TIME");
         return;
     }
-    else if (validateDate == "time_difference") {
+    else if (validate.checkTime(startTime, endTime) == "time_difference") {
         response_handler.response501Error(res, "END TIME SHOULD BE MORE THAN 24 HOURS LATER THAN START TIME");
         return;
     }
-    else if (validate.validateRequestDatetime(startTime, endTime) == false) {
+    
+    if (!validate.validateRequestDatetime(startTime, endTime)) {
         response_handler.response501Error(res, "VALIDATION CHECK FAIL");
         return;
     }

@@ -132,7 +132,7 @@ router.get("/:index", function(req, res){
     }
     
     car_repository.findOneCar(index, function(err, result){
-        if( err) res.send({code: "SQL ERROR", errorMessage: err});
+        if (err) res.send({code: "SQL ERROR", errorMessage: err});
         else res.send(result);
     });
 });

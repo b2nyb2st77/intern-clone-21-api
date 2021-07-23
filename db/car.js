@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("../db/mysql");
 const connection = mysql.init();
+const car_repository = require("../db/car");
 
 module.exports = {
     findCars: (order, type, location, startTime, endTime, callback) => {
@@ -166,4 +167,11 @@ module.exports = {
             else callback(null, result);
         });
     },
-};
+    calculateTimeDiff: (startTime, endTime) => {
+        const start = new Date(startTime).getTime();
+        const end = new Date(endTime).getTime();
+        const timeDiff = Math.floor((end - start) / 3600000);
+        
+        return timeDiff;
+    },
+ };
