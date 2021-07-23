@@ -105,7 +105,7 @@ router.get("/", function(req, res){
     }
 
     location_repository.searchLocation(searchWord, function(err, result){
-        if (err) res.send({code: "SQL ERROR", errorMessage: err});
+        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
         else res.send(result);
     });
 

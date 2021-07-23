@@ -4,11 +4,74 @@ const connection = mysql.init();
 const car_repository = require("../db/car");
 
 module.exports = {
-    findCars: (order, type, location, startTime, endTime, callback) => {
-        let sql = `SELECT c.*, a.*, rs.rs_price 
-                   FROM rentcar_status rs, car c, affiliate a 
-                   WHERE rs.rs_c_index = c.c_index
-                         AND rs.rs_a_index = a.a_index
+    findCars: (order, carType, dayType, location, startTime, endTime, callback) => {
+        const start = new Date(startTime).getTime();
+        const end = new Date(endTime).getTime();
+        const timeDiff = Math.ceil((end - start) / 3600000);
+        
+        const day = Math.floor(timeDiff / 24);
+        const hour = timeDiff % 24;
+        
+        let sql = `SELECT c.*, a.*, `;
+
+        if (day >= 7) sql += `${day} * p.p_7_days `;
+        else if (day == 5 || day == 6) sql += `${day} * p.p_5_or_6_days`;
+        else if (day == 3 || day == 4) sql += `${day} * p.p_3_or_4_days`;
+        else if (day == 1 || day == 2) sql += `${day} * p.p_1_or_2_days`;
+
+        if (hour > 0) {
+            sql += ` + 
+            CASE
+            WHEN p.p_12_hours != 0 AND ${hour} >= 12
+            THEN
+                CASE
+                WHEN p.p_6_hours != 0 AND ${hour % 12} >= 6
+                THEN
+                    CASE
+                    WHEN ${hour % 12 % 6} > 0
+                    THEN p.p_12_hours + p.p_6_hours + ${(hour % 12) % 6} * p.p_1_hour
+                    ELSE p.p_12_hours + p.p_6_hours
+                    END
+                ELSE
+                    CASE
+                    WHEN ${hour % 12} > 0
+                    THEN p.p_12_hours + ${hour % 12} * p.p_1_hour
+                    ELSE p.p_12_hours
+                    END
+                END
+            ELSE
+                CASE
+                WHEN p.p_6_hours != 0 AND ${hour} >= 6
+                THEN
+                    CASE
+                    WHEN ${hour % 6} > 0
+                    THEN ` + Math.floor(hour / 6) + ` * p.p_6_hours + ${hour % 6} * p.p_1_hour
+                    ELSE ` + Math.floor(hour / 6) + ` * p.p_6_hours
+                    END
+                ELSE ${hour} * p.p_1_hour
+                END
+            END`;       
+        }
+        
+        sql += ` AS car_price`;
+                   
+        sql += `
+                FROM rentcar_status rs, car c, affiliate a, price p
+                WHERE rs.rs_c_index = c.c_index
+                        AND rs.rs_a_index = a.a_index
+                        AND p.p_rs_index = rs.rs_index
+                        `
+        if (dayType === 'weekdays') {
+            sql +=       `AND p.p_type = 'weekdays'`;
+        }
+        else if (dayType === 'weekend') {
+            sql +=       `AND p.p_type = 'weekend'`;
+        }
+        else if (dayType === 'peakseason') {
+            sql +=       `AND p.p_type = 'peakseason'`;
+        } 
+                            
+        sql += `
                          AND rs.rs_index NOT IN (SELECT rs.rs_index
                                                  FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
                                                  WHERE rs.rs_c_index = c.c_index
@@ -22,7 +85,7 @@ module.exports = {
                                                 )`;
 
         if (order === 'type') {
-            switch (type) {
+            switch (carType) {
                 case '':
                     sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV')`;
                     break;
@@ -65,9 +128,9 @@ module.exports = {
             const sql_price = `ORDER BY FIELD(c.c_name, (SELECT group_concat(S.name) 
                                                          FROM (SELECT c.c_name name
                                                                FROM rentcar_status rs, car c 
-                                                               WHERE rs.rs_c_index = c.c_index`;
+                                                               WHERE rs.rs_c_index = c.c_index `;
 
-            switch (type) {
+            switch (carType) {
                 case '':
                     sql += sql_price;
                     break;
@@ -114,8 +177,8 @@ module.exports = {
             }
             
             sql +=  `GROUP BY c.c_name
-                     ORDER BY min(rs.rs_price) ASC
-                     ) AS S)), rs.rs_price ASC`;
+                     ORDER BY min(car_price) ASC
+                     ) AS S)), car_price ASC`;
         }
 
         return connection.query(sql, function(err, result){

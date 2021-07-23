@@ -190,18 +190,19 @@ const carTypes = [
  */
 router.get("/", function(req, res){
     const order = req.query.order;
-    let type = req.query.type;
+    let carType = req.query.type;
     const location = decodeURIComponent(req.query.location);
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
-
-    if(validate.isEmpty(type)) type = '';
-
-    if (!validate.checkInjection(order) || !validate.checkInjection(type) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
+    let dayType;
+    
+    if(validate.isEmpty(carType)) carType = '';
+    
+    if (!validate.checkInjection(order) || !validate.checkInjection(carType) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
         response_handler.response406Error(res);
         return;
     }
-
+    
     if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
         response_handler.response501Error(res, "PARAMETER IS EMPTY");
         return;
@@ -212,11 +213,11 @@ router.get("/", function(req, res){
         return;
     }
     
-    if (!~carTypes.indexOf(type)) {
+    if (!~carTypes.indexOf(carType)) {
         response_handler.response501Error(res, "TYPE DOES NOT MATCH");
         return;
     }
-
+    
     if (validate.checkTime(startTime, endTime) == "over_time") {
         response_handler.response501Error(res, "END TIME SHOULD BE QUICKER THAN START TIME");
         return;
@@ -231,17 +232,29 @@ router.get("/", function(req, res){
         return;
     }
 
-    car_repository.findCars(
+    const today = new Date();   
+
+    const date = today.getDate();  // 날짜로 성수기인지 아닌지 계산해야됨
+    const day = today.getDay();
+    
+    // 성수기가 아닐시 주중인지 주말인지 알아내기
+    if (day === 0 || day === 6) dayType = "weekend";
+    else dayType = "weekdays";
+    
+    const execSql = car_repository.findCars(
         order,
-        type,
+        carType,
+        dayType,
         location,
         startTime,
         endTime,
         function(err, result){
-            if (err) res.send({code: "SQL ERROR", errorMessage: err});
+            if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
             else res.send(result);
         },
     );
+
+    console.log(execSql.sql);
 });
 
 module.exports = router;
