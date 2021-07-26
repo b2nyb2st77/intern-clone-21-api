@@ -65,9 +65,11 @@ const locationTypes = [
  *   examples:
  *     popular_list:
  *       value:
+ *         l_index : 1
  *         l_subname : '인천공항'
  *     type_list:
  *       value:
+ *         l_index : 1
  *         l_name: '서울역'
  *         l_immediate_or_not: 'y'
  */

@@ -27,6 +27,7 @@ const error_string = require("../core/error_string");
  *            schema:
  *              $ref: '#/definitions/Location_list'
  *            example:
+ *              l_index: 1
  *              l_name: '서울역'
  *              l_immediate_or_not: 'y'
  *          404: 
@@ -53,6 +54,9 @@ const error_string = require("../core/error_string");
  *   Location_list:
  *     type: object
  *     properties:
+ *       l_index:
+ *         type: integer
+ *         description: 지역 고유번호
  *       l_name:
  *         type: string
  *         description: 지역 이름

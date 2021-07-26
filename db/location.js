@@ -7,12 +7,12 @@ module.exports = {
     findLocations: (type, callback) => {
         let sql;
         if (type === 'popular') {
-            sql = `SELECT DISTINCT l_subname 
+            sql = `SELECT DISTINCT l_index, l_subname 
                    FROM location 
                    WHERE l_popular_or_not = 'y'`;
         }
         else if (type === 'airport' || type === 'ktx' || type === 'srt' || type === 'bus' || type === 'region' || type === 'abroad') {
-            sql = `SELECT DISTINCT l_name, l_immediate_or_not 
+            sql = `SELECT DISTINCT l_index, l_name, l_immediate_or_not 
                    FROM location
                    WHERE l_type = '${type}'`;         
         }
@@ -24,7 +24,7 @@ module.exports = {
     },
     // 지역검색
     searchLocation: (searchWord, callback) => {
-        const sql = `SELECT DISTINCT l_name, l_immediate_or_not 
+        const sql = `SELECT DISTINCT l_index, l_name, l_immediate_or_not 
                      FROM location
                      WHERE l_name LIKE '%${searchWord}%'`;         
 
