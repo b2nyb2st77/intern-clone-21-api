@@ -3,6 +3,7 @@ const router = express.Router();
 const affiliate_repository = require("../db/affiliate");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 /**
  * @swagger
@@ -98,12 +99,12 @@ router.get("/:index", function(req, res){
     }
 
     if (validate.isEmpty(index)) {
-        response_handler.response501Error(res, "PARAMETER IS EMPTY");
+        response_handler.response501Error(res, PARAMETER_ERROR);
         return;
     }
     
     if (!validate.validateRequestInteger(index)) {
-        response_handler.response501Error(res, "VALIDATION CHECK FAIL");
+        response_handler.response501Error(res, VALIDATION_ERROR);
         return;
     }
 

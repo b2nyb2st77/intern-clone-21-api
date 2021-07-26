@@ -1,16 +1,25 @@
 const express = require("express");
 const mysql = require("../db/mysql");
 const connection = mysql.init();
-const car_repository = require("../db/car");
 
 module.exports = {
-    findCars: (order, carType, dayType, location, startTime, endTime, callback) => {
+    findCars: (order, carType, location, startTime, endTime, callback) => {
         const start = new Date(startTime).getTime();
         const end = new Date(endTime).getTime();
         const timeDiff = Math.ceil((end - start) / 3600000);
         
         const day = Math.floor(timeDiff / 24);
         const hour = timeDiff % 24;
+        
+        const today = new Date();   
+
+        const t_year = today.getFullYear();
+        const t_month = ('0' + (today.getMonth() + 1)).slice(-2);
+        const t_day = ('0' + today.getDate()).slice(-2);
+
+        const today_date = t_year + '-' + t_month  + '-' + t_day;
+
+        const today_day = today.getDay();
         
         let sql = `SELECT c.*, a.*, `;
 
@@ -22,67 +31,68 @@ module.exports = {
         if (hour > 0) {
             sql += ` + 
             CASE
-            WHEN p.p_12_hours != 0 AND ${hour} >= 12
-            THEN
-                CASE
-                WHEN p.p_6_hours != 0 AND ${hour % 12} >= 6
+                WHEN p.p_12_hours != 0 AND ${hour} >= 12
                 THEN
                     CASE
-                    WHEN ${hour % 12 % 6} > 0
-                    THEN p.p_12_hours + p.p_6_hours + ${(hour % 12) % 6} * p.p_1_hour
-                    ELSE p.p_12_hours + p.p_6_hours
+                        WHEN p.p_6_hours != 0 AND ${hour % 12} >= 6
+                        THEN
+                            CASE
+                                WHEN ${hour % 12 % 6} > 0
+                                THEN p.p_12_hours + p.p_6_hours + ${(hour % 12) % 6} * p.p_1_hour
+                                ELSE p.p_12_hours + p.p_6_hours
+                            END
+                        ELSE
+                            CASE
+                                WHEN ${hour % 12} > 0
+                                THEN p.p_12_hours + ${hour % 12} * p.p_1_hour
+                                ELSE p.p_12_hours
+                            END
                     END
                 ELSE
                     CASE
-                    WHEN ${hour % 12} > 0
-                    THEN p.p_12_hours + ${hour % 12} * p.p_1_hour
-                    ELSE p.p_12_hours
+                        WHEN p.p_6_hours != 0 AND ${hour} >= 6
+                        THEN
+                            CASE
+                                WHEN ${hour % 6} > 0
+                                THEN ` + Math.floor(hour / 6) + ` * p.p_6_hours + ${hour % 6} * p.p_1_hour
+                                ELSE ` + Math.floor(hour / 6) + ` * p.p_6_hours
+                            END
+                        ELSE ${hour} * p.p_1_hour
                     END
-                END
-            ELSE
-                CASE
-                WHEN p.p_6_hours != 0 AND ${hour} >= 6
-                THEN
-                    CASE
-                    WHEN ${hour % 6} > 0
-                    THEN ` + Math.floor(hour / 6) + ` * p.p_6_hours + ${hour % 6} * p.p_1_hour
-                    ELSE ` + Math.floor(hour / 6) + ` * p.p_6_hours
-                    END
-                ELSE ${hour} * p.p_1_hour
-                END
             END`;       
         }
         
         sql += ` AS car_price`;
-                   
+    
         sql += `
                 FROM rentcar_status rs, car c, affiliate a, price p
                 WHERE rs.rs_c_index = c.c_index
-                        AND rs.rs_a_index = a.a_index
-                        AND p.p_rs_index = rs.rs_index
-                        `
-        if (dayType === 'weekdays') {
-            sql +=       `AND p.p_type = 'weekdays'`;
-        }
-        else if (dayType === 'weekend') {
-            sql +=       `AND p.p_type = 'weekend'`;
-        }
-        else if (dayType === 'peakseason') {
-            sql +=       `AND p.p_type = 'peakseason'`;
-        } 
-                            
+                      AND rs.rs_a_index = a.a_index
+                      AND p.p_rs_index = rs.rs_index
+                      AND p.p_type = CASE
+                                         WHEN (SELECT COUNT(*)
+                                               FROM peak_season ps 
+                                               WHERE ps.ps_a_index = a.a_index 
+                                                     AND '${today_date}' >= ps.ps_start_date 
+                                                     AND '${today_date}' <= ps.ps_end_date) > 0
+                                         THEN 'peakseason'
+                                         ELSE `;
+
+        if (today_day === 0 || today_day === 6) sql += `'weekend'`;
+        else sql +=  `'weekdays'`;
+  
         sql += `
-                         AND rs.rs_index NOT IN (SELECT rs.rs_index
-                                                 FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
-                                                 WHERE rs.rs_c_index = c.c_index
-                                                       AND rs.rs_a_index = a.a_index
-                                                       AND rs.rs_index = rr.rr_rs_index
-                                                       AND a.a_l_index = l.l_index
-                                                       AND rr.rr_cancel_or_not = 'n'
-                                                       AND l.l_name = '${location}'
-                                                       AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
-                                                             OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'))
-                                                )`;
+                                     END 
+                      AND rs.rs_index NOT IN (SELECT rs.rs_index
+                                              FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
+                                              WHERE rs.rs_c_index = c.c_index
+                                                    AND rs.rs_a_index = a.a_index
+                                                    AND rs.rs_index = rr.rr_rs_index
+                                                    AND a.a_l_index = l.l_index
+                                                    AND rr.rr_cancel_or_not = 'n'
+                                                    AND l.l_name = '${location}'
+                                                    AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
+                                                          OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}')))`;
 
         if (order === 'type') {
             switch (carType) {
@@ -229,12 +239,5 @@ module.exports = {
             if(err) callback(err);
             else callback(null, result);
         });
-    },
-    calculateTimeDiff: (startTime, endTime) => {
-        const start = new Date(startTime).getTime();
-        const end = new Date(endTime).getTime();
-        const timeDiff = Math.floor((end - start) / 3600000);
-        
-        return timeDiff;
-    },
+    }
  };

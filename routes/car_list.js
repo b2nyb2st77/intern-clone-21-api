@@ -3,6 +3,7 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 const carTypes = [
     '',
@@ -78,7 +79,7 @@ const carTypes = [
  *              a_grade: 4.9
  *              a_l_index: 13
  *              a_new_or_not: 'n'
- *              rs_price: 55000
+ *              car_price: 55000
  *          404: 
  *            description: 차량 리스트 불러오기 실패
  *            schema:
@@ -184,7 +185,7 @@ const carTypes = [
  *         type: string
  *         enum: [y, n]
  *         description: 신규등록업체 유무
- *       rs_price:
+ *       car_price:
  *         type: integer
  *         description: 렌트가능차량 가격
  */
@@ -194,7 +195,6 @@ router.get("/", function(req, res){
     const location = decodeURIComponent(req.query.location);
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
-    let dayType;
     
     if(validate.isEmpty(carType)) carType = '';
     
@@ -204,47 +204,41 @@ router.get("/", function(req, res){
     }
     
     if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res, "PARAMETER IS EMPTY");
+        response_handler.response501Error(res, PARAMETER_ERROR);
         return;
     }
     
     if (!(order === "type" || order === "price")) {
-        response_handler.response501Error(res, "ORDER DOES NOT MATCH");
+        response_handler.response501Error(res, "ORDER " + TYPE_ERROR);
         return;
     }
     
     if (!~carTypes.indexOf(carType)) {
-        response_handler.response501Error(res, "TYPE DOES NOT MATCH");
+        response_handler.response501Error(res, "TYPE " + TYPE_ERROR);
         return;
     }
     
-    if (validate.checkTime(startTime, endTime) == "over_time") {
-        response_handler.response501Error(res, "END TIME SHOULD BE QUICKER THAN START TIME");
+    if (validate.checkTime(startTime, endTime) == OVER_TIME) {
+        response_handler.response501Error(res, OVER_TIME_ERROR);
         return;
     }
-    else if (validate.checkTime(startTime, endTime) == "time_difference") {
-        response_handler.response501Error(res, "END TIME SHOULD BE MORE THAN 24 HOURS LATER THAN START TIME");
+    else if (validate.checkTime(startTime, endTime) == TIME_DIFFERENCE) {
+        response_handler.response501Error(res, TIME_DIFFERENCE_ERROR);
+        return;
+    }
+    else if (validate.checkTime(startTime, endTime) == PAST_TIME) {
+        response_handler.response501Error(res, PAST_TIME_ERROR);
         return;
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res, "VALIDATION CHECK FAIL");
+        response_handler.response501Error(res, VALIDATION_ERROR);
         return;
     }
-
-    const today = new Date();   
-
-    const date = today.getDate();  // 날짜로 성수기인지 아닌지 계산해야됨
-    const day = today.getDay();
-    
-    // 성수기가 아닐시 주중인지 주말인지 알아내기
-    if (day === 0 || day === 6) dayType = "weekend";
-    else dayType = "weekdays";
     
     const execSql = car_repository.findCars(
         order,
         carType,
-        dayType,
         location,
         startTime,
         endTime,

@@ -1,5 +1,6 @@
 const express = require("express");
-const car_repository = require("../db/car");
+const time = require("./time");
+const error_string = require("./error_string");
 
 module.exports = {
     validateRequestInteger: (index) => {
@@ -10,8 +11,10 @@ module.exports = {
         return regexp.test(startTime) && regexp.test(endTime);
     },
     checkTime: (startTime, endTime) => {
-        if (startTime >= endTime) return "over_time";
-        else if (car_repository.calculateTimeDiff(startTime, endTime) < 24) return "time_difference";
+        if (startTime >= endTime) return OVER_TIME;
+        else if (time.calculateTimeDiff(startTime, endTime) < 24) return TIME_DIFFERENCE;
+        else if (!time.compareTime(startTime, endTime)) return PAST_TIME;
+        else return OK;
     },
     isEmpty: (str) => {
         return (typeof str == "undefined" || str == null || str == "") ? true : false;

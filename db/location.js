@@ -14,7 +14,7 @@ module.exports = {
         else if (type === 'airport' || type === 'ktx' || type === 'srt' || type === 'bus' || type === 'region' || type === 'abroad') {
             sql = `SELECT DISTINCT l_name, l_immediate_or_not 
                    FROM location
-                   WHERE l_type = ${type}`;         
+                   WHERE l_type = '${type}'`;         
         }
 
         return connection.query(sql, function(err, result){

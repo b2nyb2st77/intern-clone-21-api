@@ -3,6 +3,7 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 /**
  * @swagger
@@ -90,21 +91,25 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(carName) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res, "PARAMETER IS EMPTY");
+        response_handler.response501Error(res, PARAMETER_ERROR);
         return;
     }
     
-    if (validate.checkTime(startTime, endTime) == "over_time") {
-        response_handler.response501Error(res, "END TIME SHOULD BE QUICKER THAN START TIME");
+    if (validate.checkTime(startTime, endTime) == OVER_TIME) {
+        response_handler.response501Error(res, OVER_TIME_ERROR);
         return;
     }
-    else if (validate.checkTime(startTime, endTime) == "time_difference") {
-        response_handler.response501Error(res, "END TIME SHOULD BE MORE THAN 24 HOURS LATER THAN START TIME");
+    else if (validate.checkTime(startTime, endTime) == TIME_DIFFERENCE) {
+        response_handler.response501Error(res, TIME_DIFFERENCE_ERROR);
+        return;
+    }
+    else if (validate.checkTime(startTime, endTime) == PAST_TIME) {
+        response_handler.response501Error(res, PAST_TIME_ERROR);
         return;
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res, "VALIDATION CHECK FAIL");
+        response_handler.response501Error(res, VALIDATION_ERROR);
         return;
     }
 

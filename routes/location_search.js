@@ -3,6 +3,7 @@ const router = express.Router();
 const location_repository = require("../db/location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 /**
  * @swagger
@@ -100,7 +101,7 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(searchWord)) {
-        response_handler.response501Error(res, "PARAMETER IS EMPTY");
+        response_handler.response501Error(res, PARAMETER_ERROR);
         return;
     }
 

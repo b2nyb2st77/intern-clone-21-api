@@ -3,6 +3,7 @@ const router = express.Router();
 const dl_repository = require("../db/delivery_location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 /**
  * @swagger
@@ -69,7 +70,7 @@ router.get("/", function(req, res){
         return;
     }
 
-    if (validate.isEmpty(affiliateName, "PARAMETER IS EMPTY")) {
+    if (validate.isEmpty(affiliateName, PARAMETER_ERROR)) {
         response_handler.response501Error(res);
         return;
     }
