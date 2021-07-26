@@ -80,12 +80,12 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(type)) {
-        response_handler.response501Error(res, PARAMETER_ERROR);
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR);
         return;
     }
 
     if (!~locationTypes.indexOf(type)) {
-        response_handler.response501Error(res, "TYPE " + TYPE_ERROR);
+        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR);
         return;
     }
     

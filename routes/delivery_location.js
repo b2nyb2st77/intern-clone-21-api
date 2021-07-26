@@ -70,7 +70,7 @@ router.get("/", function(req, res){
         return;
     }
 
-    if (validate.isEmpty(affiliateName, PARAMETER_ERROR)) {
+    if (validate.isEmpty(affiliateName, error_string.PARAMETER_ERROR)) {
         response_handler.response501Error(res);
         return;
     }

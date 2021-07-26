@@ -11,10 +11,10 @@ module.exports = {
         return regexp.test(startTime) && regexp.test(endTime);
     },
     checkTime: (startTime, endTime) => {
-        if (startTime >= endTime) return OVER_TIME;
-        else if (time.calculateTimeDiff(startTime, endTime) < 24) return TIME_DIFFERENCE;
-        else if (!time.compareTime(startTime, endTime)) return PAST_TIME;
-        else return OK;
+        if (startTime >= endTime) return error_string.OVER_TIME;
+        else if (time.calculateTimeDiff(startTime, endTime) < 24) return error_string.TIME_DIFFERENCE;
+        else if (!time.compareTime(startTime, endTime)) return error_string.PAST_TIME;
+        else return error_string.OK;
     },
     isEmpty: (str) => {
         return (typeof str == "undefined" || str == null || str == "") ? true : false;

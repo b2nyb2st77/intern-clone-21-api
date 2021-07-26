@@ -209,30 +209,30 @@ router.get("/", function(req, res){
     }
     
     if (!(order === "type" || order === "price")) {
-        response_handler.response501Error(res, "ORDER " + TYPE_ERROR);
+        response_handler.response501Error(res, "ORDER " + error_string.TYPE_ERROR);
         return;
     }
     
     if (!~carTypes.indexOf(carType)) {
-        response_handler.response501Error(res, "TYPE " + TYPE_ERROR);
+        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR);
         return;
     }
     
-    if (validate.checkTime(startTime, endTime) == OVER_TIME) {
-        response_handler.response501Error(res, OVER_TIME_ERROR);
+    if (validate.checkTime(startTime, endTime) == error_string.OVER_TIME) {
+        response_handler.response501Error(res, error_string.OVER_TIME_ERROR);
         return;
     }
-    else if (validate.checkTime(startTime, endTime) == TIME_DIFFERENCE) {
-        response_handler.response501Error(res, TIME_DIFFERENCE_ERROR);
+    else if (validate.checkTime(startTime, endTime) == error_string.TIME_DIFFERENCE) {
+        response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR);
         return;
     }
-    else if (validate.checkTime(startTime, endTime) == PAST_TIME) {
-        response_handler.response501Error(res, PAST_TIME_ERROR);
+    else if (validate.checkTime(startTime, endTime) == error_string.PAST_TIME) {
+        response_handler.response501Error(res, error_string.PAST_TIME_ERROR);
         return;
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res, VALIDATION_ERROR);
+        response_handler.response501Error(res, error_string.VALIDATION_ERROR);
         return;
     }
     
