@@ -95,17 +95,18 @@ router.get("/", function(req, res){
         return;
     }
     
-    if (validate.checkTime(startTime, endTime) == error_string.OVER_TIME) {
-        response_handler.response501Error(res, error_string.OVER_TIME_ERROR);
-        return;
-    }
-    else if (validate.checkTime(startTime, endTime) == error_string.TIME_DIFFERENCE) {
-        response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR);
-        return;
-    }
-    else if (validate.checkTime(startTime, endTime) == error_string.PAST_TIME) {
-        response_handler.response501Error(res, error_string.PAST_TIME_ERROR);
-        return;
+    switch (validate.checkTime(startTime, endTime)) {
+        case error_string.OVER_TIME:
+            response_handler.response501Error(res, error_string.OVER_TIME_ERROR);
+            return;
+        case error_string.TIME_DIFFERENCE:
+            response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR);
+            return;
+        case error_string.PAST_TIME:
+            response_handler.response501Error(res, error_string.PAST_TIME_ERROR);
+            return;
+        default:
+            break;    
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
@@ -119,10 +120,9 @@ router.get("/", function(req, res){
         startTime, 
         endTime, 
         function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else res.send(result);
+            if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+            else res.send(result);
     });
-
 });
 
 module.exports = router;

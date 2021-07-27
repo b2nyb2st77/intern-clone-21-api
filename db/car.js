@@ -17,7 +17,7 @@ module.exports = {
         const t_month = ('0' + (today.getMonth() + 1)).slice(-2);
         const t_day = ('0' + today.getDate()).slice(-2);
 
-        const today_date = t_year + '-' + t_month  + '-' + t_day;
+        const today_date = `${t_year}-${t_month}-${t_day}`;
 
         const today_day = today.getDay();
         
@@ -195,7 +195,6 @@ module.exports = {
             if(err) callback(err);
             else callback(null, result);
         });
-
     },
     // 마감된 차량의 업체 개수, 차량 개수 찾기
     findReservedCar: (carName, location, startTime, endTime, callback) => {

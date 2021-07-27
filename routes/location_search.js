@@ -113,7 +113,6 @@ router.get("/", function(req, res){
         if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
         else res.send(result);
     });
-
 });
 
 module.exports = router;
