@@ -198,7 +198,7 @@ module.exports = {
     },
     // 마감된 차량의 업체 개수, 차량 개수 찾기
     findReservedCar: (carName, location, startTime, endTime, callback) => {
-        const sql1 = `SELECT COUNT(S.name) number_of_affiliate
+        const sql1 = `SELECT COUNT(S.name) count
                       FROM (SELECT a.a_name name
                             FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
                             WHERE c.c_name = '${carName}'
@@ -212,7 +212,7 @@ module.exports = {
                                         OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'))
                             GROUP BY a.a_name) AS S;`;
                             
-        const sql2 = `SELECT COUNT(*) number_of_car
+        const sql2 = `SELECT COUNT(*) count
                       FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
                       WHERE c.c_name = '${carName}'
                             AND rs.rs_c_index = c.c_index
