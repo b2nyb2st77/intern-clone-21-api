@@ -38,7 +38,7 @@ module.exports = {
                         THEN
                             CASE
                                 WHEN ${hour % 12 % 6} > 0
-                                THEN p.p_12_hours + p.p_6_hours + ${(hour % 12) % 6} * p.p_1_hour
+                                THEN p.p_12_hours + p.p_6_hours + ${hour % 12 % 6} * p.p_1_hour
                                 ELSE p.p_12_hours + p.p_6_hours
                             END
                         ELSE

@@ -102,6 +102,9 @@ router.get("/", function(req, res){
         case error_string.TIME_DIFFERENCE:
             response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR);
             return;
+        case error_string.DATE_DIFFERENCE:
+            response_handler.response501Error(res, error_string.DATE_DIFFERENCE_ERROR);
+            return;
         case error_string.PAST_TIME:
             response_handler.response501Error(res, error_string.PAST_TIME_ERROR);
             return;

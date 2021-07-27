@@ -13,6 +13,7 @@ module.exports = {
     checkTime: (startTime, endTime) => {
         if (startTime >= endTime) return error_string.OVER_TIME;
         else if (time.calculateTimeDiff(startTime, endTime) < 24) return error_string.TIME_DIFFERENCE;
+        else if (time.calculateDateDiff(startTime, endTime) > 14) return error_string.DATE_DIFFERENCE;
         else if (!time.compareTime(startTime, endTime)) return error_string.PAST_TIME;
         else return error_string.OK;
     },
