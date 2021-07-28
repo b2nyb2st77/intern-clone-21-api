@@ -105,7 +105,7 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(searchWord)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR);
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 

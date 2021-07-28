@@ -1,5 +1,5 @@
 const express = require("express");
-const time = require("./time");
+const time = require("./check_time");
 const error_string = require("./error_string");
 
 module.exports = {
@@ -11,10 +11,10 @@ module.exports = {
         return regexp.test(startTime) && regexp.test(endTime);
     },
     checkTime: (startTime, endTime) => {
-        if (startTime >= endTime) return error_string.OVER_TIME;
-        else if (time.calculateTimeDiff(startTime, endTime) < 24) return error_string.TIME_DIFFERENCE;
-        else if (time.calculateDateDiff(startTime, endTime) > 14) return error_string.DATE_DIFFERENCE;
-        else if (!time.compareTime(startTime, endTime)) return error_string.PAST_TIME;
+        if (startTime >= endTime) return error_string.OVER_TIME_ERROR;
+        else if (!time.checkIfTimeDiffIsLessThan24Hours(startTime, endTime)) return error_string.TIME_DIFFERENCE_ERROR;
+        else if (!time.checkIfDateDiffIsMoreThan14Days(startTime, endTime)) return error_string.DATE_DIFFERENCE_ERROR;
+        else if (!time.checkIfTimeIsLaterThanNow(startTime, endTime)) return error_string.PAST_TIME_ERROR;
         else return error_string.OK;
     },
     isEmpty: (str) => {

@@ -10,7 +10,7 @@ const options = {
             version: '1.0.0',
             description: 'Test API of Carmore',
         },
-        host: 'ec2-13-125-238-123.ap-northeast-2.compute.amazonaws.com:3000',
+        host: 'localhost:3000',
         basePath: '/'
     },
     apis: ['./routes/*.js', './swagger/*']

@@ -82,12 +82,12 @@ router.get("/", function(req, res){
     }
 
     if (validate.isEmpty(type)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR);
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 
     if (!~locationTypes.indexOf(type)) {
-        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR);
+        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
     

@@ -204,39 +204,39 @@ router.get("/", function(req, res){
     }
     
     if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res, PARAMETER_ERROR);
+        response_handler.response501Error(res, PARAMETER_ERROR_MESSAGE);
         return;
     }
     
     if (!(order === "type" || order === "price")) {
-        response_handler.response501Error(res, "ORDER " + error_string.TYPE_ERROR);
+        response_handler.response501Error(res, "ORDER " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
     
     if (!~carTypes.indexOf(carType)) {
-        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR);
+        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
     
     switch (validate.checkTime(startTime, endTime)) {
-        case error_string.OVER_TIME:
-            response_handler.response501Error(res, error_string.OVER_TIME_ERROR);
+        case error_string.OVER_TIME_ERROR:
+            response_handler.response501Error(res, error_string.OVER_TIME_ERROR_MESSAGE);
             return;
-        case error_string.TIME_DIFFERENCE:
-            response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR);
+        case error_string.TIME_DIFFERENCE_ERROR:
+            response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR_MESSAGE);
             return;
-        case error_string.DATE_DIFFERENCE:
-            response_handler.response501Error(res, error_string.DATE_DIFFERENCE_ERROR);
+        case error_string.DATE_DIFFERENCE_ERROR:
+            response_handler.response501Error(res, error_string.DATE_DIFFERENCE_ERROR_MESSAGE);
             return;
-        case error_string.PAST_TIME:
-            response_handler.response501Error(res, error_string.PAST_TIME_ERROR);
+        case error_string.PAST_TIME_ERROR:
+            response_handler.response501Error(res, error_string.PAST_TIME_ERROR_MESSAGE);
             return;
         default:
             break;    
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res, error_string.VALIDATION_ERROR);
+        response_handler.response501Error(res, error_string.VALIDATION_ERROR_MESSAGE);
         return;
     }
     
