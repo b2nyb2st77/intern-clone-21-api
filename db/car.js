@@ -10,7 +10,7 @@ module.exports = {
         const end = new Date(endTime).getTime();
         const [day, hour] =  time.calculateTimeDiffForPrice(start, end);
         const [today_date, today_day] = time.calculateDayAndDateOfToday();
-        const weekends = [0, 6];
+        const weekdays = [1, 2, 3, 4, 5];
         
         let sql = `SELECT c.*, a.*, `;
 
@@ -72,12 +72,12 @@ module.exports = {
                                          THEN 'peakseason'
                                          ELSE `;
 
-        if (weekends.indexOf(today_day)) sql += `'weekend'`;
+        if (!~weekdays.indexOf(today_day)) sql += `'weekend'`;
         else sql +=  `'weekdays'`;
   
         sql += `
                                      END 
-                      AND rs.rs_index NOT IN (SELECT rs.rs_index
+                      AND rs.rs_index NOT IN (SELECT distinct rr.rr_rs_index
                                               FROM rentcar_status rs, rentcar_reservation rr
                                               WHERE rs.rs_index = rr.rr_rs_index
                                                     AND rr.rr_cancel_or_not = 'n'
