@@ -12,15 +12,15 @@ module.exports = {
     },
     checkTime: (startTime, endTime) => {
         if (startTime >= endTime) return error_string.OVER_TIME_ERROR;
-        else if (!time.checkIfTimeDiffIsLessThan24Hours(startTime, endTime)) return error_string.TIME_DIFFERENCE_ERROR;
-        else if (!time.checkIfDateDiffIsMoreThan14Days(startTime, endTime)) return error_string.DATE_DIFFERENCE_ERROR;
+        else if (!time.checkIfTimeDiffIsLessThanMinimumHoursOfRent(startTime, endTime)) return error_string.TIME_DIFFERENCE_ERROR;
+        else if (!time.checkIfDateDiffIsMoreThanMaximumDaysOfRent(startTime, endTime)) return error_string.DATE_DIFFERENCE_ERROR;
         else if (!time.checkIfTimeIsLaterThanNow(startTime, endTime)) return error_string.PAST_TIME_ERROR;
         else return error_string.OK;
     },
     isEmpty: (str) => {
-        return (typeof str == "undefined" || str == null || str == "") ? true : false;
+        return (typeof str === "undefined" || str === null || str === "") ? true : false;
     },
-    checkInjection: (obj) => { 
+    checkInjection: (obj) => {
         if (obj.length > 0) {
             const expText = /[%=><]/;
             if (expText.test(obj)) return false; 

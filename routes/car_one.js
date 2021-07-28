@@ -116,14 +116,14 @@ const error_string = require("../core/error_string");
  */
 router.get("/:index", function(req, res){
     const index = req.params.index;
-    
-    if (!validate.checkInjection(index)) {
-        response_handler.response406Error(res);
-        return;
-    }
 
     if (validate.isEmpty(index)) {
         response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        return;
+    }
+    
+    if (!validate.checkInjection(index)) {
+        response_handler.response406Error(res);
         return;
     }
 

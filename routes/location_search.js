@@ -99,13 +99,13 @@ const error_string = require("../core/error_string");
 router.get("/", function(req, res){
     const searchWord = decodeURIComponent(req.query.searchWord);
 
-    if (!validate.checkInjection(searchWord)) {
-        response_handler.response406Error(res);
+    if (validate.isEmpty(searchWord)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 
-    if (validate.isEmpty(searchWord)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+    if (!validate.checkInjection(searchWord)) {
+        response_handler.response406Error(res);
         return;
     }
 

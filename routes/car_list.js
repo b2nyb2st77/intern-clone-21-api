@@ -6,7 +6,7 @@ const validate = require("../core/validate");
 const error_string = require("../core/error_string");
 
 const carTypes = [
-    '',
+    'all',
     'elec',
     'small',
     'middle',
@@ -196,15 +196,15 @@ router.get("/", function(req, res){
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
     
-    if(validate.isEmpty(carType)) carType = '';
+    if(validate.isEmpty(carType)) carType = "all";
     
-    if (!validate.checkInjection(order) || !validate.checkInjection(carType) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
-        response_handler.response406Error(res);
+    if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
     
-    if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res, PARAMETER_ERROR_MESSAGE);
+    if (!validate.checkInjection(order) || !validate.checkInjection(carType) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
+        response_handler.response406Error(res);
         return;
     }
     
@@ -212,7 +212,7 @@ router.get("/", function(req, res){
         response_handler.response501Error(res, "ORDER " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
-    
+
     if (!~carTypes.indexOf(carType)) {
         response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR_MESSAGE);
         return;

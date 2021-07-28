@@ -1,25 +1,16 @@
 const express = require("express");
 const mysql = require("../db/mysql");
 const connection = mysql.init();
+const number = require("../core/number_string");
+const time = require("../core/calculate_time");
 
 module.exports = {
     findCars: (order, carType, location, startTime, endTime, callback) => {
         const start = new Date(startTime).getTime();
         const end = new Date(endTime).getTime();
-        const timeDiff = Math.ceil((end - start) / 3600000);
-        
-        const day = Math.floor(timeDiff / 24);
-        const hour = timeDiff % 24;
-        
-        const today = new Date();   
-
-        const t_year = today.getFullYear();
-        const t_month = ('0' + (today.getMonth() + 1)).slice(-2);
-        const t_day = ('0' + today.getDate()).slice(-2);
-
-        const today_date = `${t_year}-${t_month}-${t_day}`;
-
-        const today_day = today.getDay();
+        const [day, hour] =  time.calculateTimeDiffForPrice(start, end);
+        const [today_date, today_day] = time.calculateDayAndDateOfToday();
+        const weekends = [0, 6];
         
         let sql = `SELECT c.*, a.*, `;
 
@@ -69,7 +60,8 @@ module.exports = {
                 WHERE rs.rs_c_index = c.c_index
                       AND rs.rs_a_index = a.a_index
                       AND a.a_l_index = l.l_index
-                      AND l.l_name = '${location}'
+                      AND (l.l_name = '${location}'
+                           OR l.l_subname = '${location}')
                       AND p.p_rs_index = rs.rs_index
                       AND p.p_type = CASE
                                          WHEN (SELECT COUNT(*)
@@ -80,7 +72,7 @@ module.exports = {
                                          THEN 'peakseason'
                                          ELSE `;
 
-        if (today_day === 0 || today_day === 6) sql += `'weekend'`;
+        if (weekends.indexOf(today_day)) sql += `'weekend'`;
         else sql +=  `'weekdays'`;
   
         sql += `
@@ -94,10 +86,7 @@ module.exports = {
 
         if (order === 'type') {
             switch (carType) {
-                case '':
-                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name ASC`;
-                    break;
-                case null:
+                case 'all':
                     sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name ASC`;
                     break;
                 case 'elec':
@@ -139,10 +128,7 @@ module.exports = {
                                                                WHERE rs.rs_c_index = c.c_index `;
 
             switch (carType) {
-                case '':
-                    sql += sql_price;
-                    break;
-                case null:
+                case all:
                     sql += sql_price;
                     break;
                 case 'elec':
@@ -205,7 +191,8 @@ module.exports = {
                                   AND rs.rs_index = rr.rr_rs_index
                                   AND a.a_l_index = l.l_index
                                   AND rr.rr_cancel_or_not = 'n'
-                                  AND l.l_name = '${location}'
+                                  AND (l.l_name = '${location}'
+                                       OR l.l_subname = '${location}')
                                   AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
                                         OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'))
                             GROUP BY a.a_name) AS S;`;
@@ -218,7 +205,8 @@ module.exports = {
                             AND rs.rs_index = rr.rr_rs_index
                             AND a.a_l_index = l.l_index
                             AND rr.rr_cancel_or_not = 'n'
-                            AND l.l_name = '${location}'
+                            AND (l.l_name = '${location}'
+                                 OR l.l_subname = '${location}')
                             AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
                                   OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'));`;
 

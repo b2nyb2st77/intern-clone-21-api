@@ -76,13 +76,13 @@ const locationTypes = [
 router.get("/", function(req, res){
     const type = req.query.type;
 
-    if (!validate.checkInjection(type)) {
-        response_handler.response406Error(res);
+    if (validate.isEmpty(type)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 
-    if (validate.isEmpty(type)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+    if (!validate.checkInjection(type)) {
+        response_handler.response406Error(res);
         return;
     }
 

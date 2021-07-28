@@ -85,13 +85,13 @@ router.get("/", function(req, res){
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
 
-    if (!validate.checkInjection(carName) || !validate.checkInjection(location) || !validate.checkInjection(startTime) ||!validate.checkInjection(endTime)) {
-        response_handler.response406Error(res);
+    if (validate.isEmpty(carName) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 
-    if (validate.isEmpty(carName) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+    if (!validate.checkInjection(carName) || !validate.checkInjection(location) || !validate.checkInjection(startTime) ||!validate.checkInjection(endTime)) {
+        response_handler.response406Error(res);
         return;
     }
     
