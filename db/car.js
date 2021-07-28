@@ -87,35 +87,35 @@ module.exports = {
         if (order === 'type') {
             switch (carType) {
                 case 'all':
-                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name ASC`;
+                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name, a.a_name ASC`;
                     break;
                 case 'elec':
                     sql += `AND c.c_fuel = '전기'
-                            ORDER BY c.c_name ASC`;
+                            ORDER BY c.c_name, a.a_name ASC`;
                     break;
                 case 'small':
                     sql += `AND c.c_type IN ('경형', '소형')
-                            ORDER BY FIELD(c.c_type, '경형', '소형'), c.c_name ASC`;
+                            ORDER BY FIELD(c.c_type, '경형', '소형'), c.c_name, a.a_name ASC`;
                     break;
                 case 'middle':
                     sql += `AND c.c_type = '준중형'
-                            ORDER BY c.c_name ASC`;
+                            ORDER BY c.c_name, a.a_name ASC`;
                     break;
                 case 'big':
                     sql += `AND c.c_type IN ('중형', '대형')
-                            ORDER BY FIELD(c.c_type, '중형', '대형'), c.c_name ASC`;
+                            ORDER BY FIELD(c.c_type, '중형', '대형'), c.c_name, a.a_name ASC`;
                     break;
                 case 'suv':
                     sql += `AND c.c_type = 'SUV'
-                            ORDER BY c.c_name ASC`;
+                            ORDER BY c.c_name, a.a_name ASC`;
                     break;
                 case 'rv':
                     sql += `AND c.c_type = 'RV'
-                            ORDER BY c.c_name ASC`;
+                            ORDER BY c.c_name, a.a_name ASC`;
                     break;
                 case 'import':
                     sql += `AND c.c_type = '수입'
-                            ORDER BY c.c_name ASC`;
+                            ORDER BY c.c_name, a.a_name ASC`;
                     break;
                 default:
                     break;
