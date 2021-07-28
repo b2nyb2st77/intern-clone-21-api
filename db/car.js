@@ -65,9 +65,11 @@ module.exports = {
         sql += ` AS car_price`;
     
         sql += `
-                FROM rentcar_status rs, car c, affiliate a, price p
+                FROM rentcar_status rs, car c, affiliate a, price p, location l
                 WHERE rs.rs_c_index = c.c_index
                       AND rs.rs_a_index = a.a_index
+                      AND a.a_l_index = l.l_index
+                      AND l.l_name = '${location}'
                       AND p.p_rs_index = rs.rs_index
                       AND p.p_type = CASE
                                          WHEN (SELECT COUNT(*)
@@ -84,23 +86,19 @@ module.exports = {
         sql += `
                                      END 
                       AND rs.rs_index NOT IN (SELECT rs.rs_index
-                                              FROM rentcar_status rs, car c, affiliate a, rentcar_reservation rr, location l
-                                              WHERE rs.rs_c_index = c.c_index
-                                                    AND rs.rs_a_index = a.a_index
-                                                    AND rs.rs_index = rr.rr_rs_index
-                                                    AND a.a_l_index = l.l_index
+                                              FROM rentcar_status rs, rentcar_reservation rr
+                                              WHERE rs.rs_index = rr.rr_rs_index
                                                     AND rr.rr_cancel_or_not = 'n'
-                                                    AND l.l_name = '${location}'
-                                                    AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
-                                                          OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}')))`;
+                                                    AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
+                                                          OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'))) `;
 
         if (order === 'type') {
             switch (carType) {
                 case '':
-                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV')`;
+                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name ASC`;
                     break;
                 case null:
-                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV')`;
+                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name ASC`;
                     break;
                 case 'elec':
                     sql += `AND c.c_fuel = '전기'
@@ -208,8 +206,8 @@ module.exports = {
                                   AND a.a_l_index = l.l_index
                                   AND rr.rr_cancel_or_not = 'n'
                                   AND l.l_name = '${location}'
-                                  AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
-                                        OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'))
+                                  AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
+                                        OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'))
                             GROUP BY a.a_name) AS S;`;
                             
         const sql2 = `SELECT COUNT(*) count
@@ -221,8 +219,8 @@ module.exports = {
                             AND a.a_l_index = l.l_index
                             AND rr.rr_cancel_or_not = 'n'
                             AND l.l_name = '${location}'
-                            AND ((rr.rr_start_time <= '${endTime}' AND rr.rr_end_time >= '${endTime}')
-                                  OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${startTime}'));`;
+                            AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
+                                  OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'));`;
 
         return connection.query(sql1 + sql2, function(err, result){
             if(err) callback(err);
