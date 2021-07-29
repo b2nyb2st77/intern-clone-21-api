@@ -6,9 +6,9 @@ const time = require("../core/calculate_time");
 
 module.exports = {
     findCars: (order, carType, location, startTime, endTime, callback) => {
-        const start = new Date(startTime).getTime();
-        const end = new Date(endTime).getTime();
-        const [day, hour] =  time.calculateTimeDiffForPrice(start, end);
+        const start = time.calculateMillisecondsOfTime(startTime);
+        const end = time.calculateMillisecondsOfTime(endTime);
+        const [day, hour] =  time.calculateDayAndHourForPrice(start, end);
         const [today_date, today_day] = time.calculateDayAndDateOfToday();
         const weekdays = [1, 2, 3, 4, 5];
         
@@ -172,7 +172,7 @@ module.exports = {
             
             sql +=  `GROUP BY c.c_name
                      ORDER BY min(car_price) ASC
-                     ) AS S)), a.a_name, car_price ASC`;
+                     ) AS S)), car_price, a.a_name ASC`;
         }
 
         return connection.query(sql, function(err, result){
