@@ -128,7 +128,7 @@ module.exports = {
                                                                WHERE rs.rs_c_index = c.c_index `;
 
             switch (carType) {
-                case all:
+                case 'all':
                     sql += sql_price;
                     break;
                 case 'elec':
@@ -172,7 +172,7 @@ module.exports = {
             
             sql +=  `GROUP BY c.c_name
                      ORDER BY min(car_price) ASC
-                     ) AS S)), car_price ASC`;
+                     ) AS S)), a.a_name, car_price ASC`;
         }
 
         return connection.query(sql, function(err, result){
