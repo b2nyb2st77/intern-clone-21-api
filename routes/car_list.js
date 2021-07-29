@@ -216,18 +216,34 @@ router.get("/", function(req, res){
         return;
     }
     
-    const execSql = car_repository.findCars(
+    car_repository.findCars(
         order,
         location,
         startTime,
         endTime,
         function(err, result){
             if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-            else res.send(result);
+            else {
+                const car_list = result;
+
+                for (let i = 0; i < car_list.length; i++) {
+                    const c_index = car_list[i].c_index;
+                    const a_index = car_list[i].a_index;
+                    let price;
+
+                    car_repository.findPriceListOfCar(c_index, a_index, function(err, result){
+                        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+                        else {
+                            price = car_repository.calculatePriceOfCar(startTime, endTime, result[0]);
+                            car_list[i].car_price = price;
+                            res.send(car_list[i]);
+                        }    
+                    });
+                }
+                res.send(car_list);
+            }
         }
     );
-
-    console.log(execSql.sql);
 });
 
 module.exports = router;
