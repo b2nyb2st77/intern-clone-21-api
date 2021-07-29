@@ -3,6 +3,7 @@ const router = express.Router();
 const location_repository = require("../db/location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 const locationTypes = [
     'popular',
@@ -17,7 +18,7 @@ const locationTypes = [
 /**
  * @swagger
  * paths:
- *  /locations:
+ *   /locations:
  *     get:
  *        tags:
  *        - location
@@ -42,44 +43,58 @@ const locationTypes = [
  *                $ref: '#/components/examples/type_list'                     
  *          404: 
  *            description: 지역 리스트 불러오기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: type값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * 
  * components:
  *   examples:
  *     popular_list:
  *       value:
+ *         l_index : 1
  *         l_subname : '인천공항'
  *     type_list:
  *       value:
+ *         l_index : 1
  *         l_name: '서울역'
  *         l_immediate_or_not: 'y'
  */
 router.get("/", function(req, res){
     const type = req.query.type;
 
+    if (validate.isEmpty(type)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        return;
+    }
+
     if (!validate.checkInjection(type)) {
         response_handler.response406Error(res);
         return;
     }
 
-    if (validate.isEmpty(type)) {
-        response_handler.response501Error(res);
-        return;
-    }
-
     if (!~locationTypes.indexOf(type)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
     
     location_repository.findLocations(type, function(err, result){
-        if(err) throw err;
-        res.send(result);
+        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
     });
-
 });
 
 module.exports = router;

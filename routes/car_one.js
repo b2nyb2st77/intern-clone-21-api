@@ -3,10 +3,12 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 /**
  * @swagger
- *  /car/{index}:
+ * paths:
+ *   /car/{index}:
  *     get:
  *        tags:
  *        - car
@@ -39,6 +41,23 @@ const validate = require("../core/validate");
  *              c_driver_age: 21
  *          404: 
  *            description: 차량 정보 불러오기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
+ *          406: 
+ *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
+ *          501: 
+ *            description: index값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * 
  * definitions:
  *   Car_one:
@@ -97,25 +116,25 @@ const validate = require("../core/validate");
  */
 router.get("/:index", function(req, res){
     const index = req.params.index;
+
+    if (validate.isEmpty(index)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        return;
+    }
     
     if (!validate.checkInjection(index)) {
         response_handler.response406Error(res);
         return;
     }
 
-    if (validate.isEmpty(index)) {
-        response_handler.response501Error(res);
-        return;
-    }
-
     if (!validate.validateRequestInteger(index)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, error_string.VALIDATION_ERROR_MESSAGE);
         return;
     }
     
     car_repository.findOneCar(index, function(err, result){
-        if(err) throw err;
-        res.send(result);
+        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
     });
 });
 

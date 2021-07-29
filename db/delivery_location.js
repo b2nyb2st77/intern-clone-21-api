@@ -7,7 +7,7 @@ module.exports = {
         const sql = `SELECT dl.dl_sido, dl.dl_gu 
                      FROM delivery_location dl, affiliate a
                      WHERE dl.dl_a_index = a.a_index
-                           AND a.a_name = ${affiliateName}`;
+                           AND a.a_name = '${affiliateName}'`;
         
         return connection.query(sql, function(err, result){
             if(err) throw err;

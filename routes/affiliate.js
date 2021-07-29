@@ -3,10 +3,12 @@ const router = express.Router();
 const affiliate_repository = require("../db/affiliate");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const error_string = require("../core/error_string");
 
 /**
  * @swagger
- *  /affiliate/{index}:
+ * paths:
+ *   /affiliate/{index}:
  *     get:
  *        tags:
  *        - affiliate
@@ -34,10 +36,23 @@ const validate = require("../core/validate");
  *              a_new_or_not: 'n'
  *          404: 
  *            description: 업체 정보 불러오기 실패
+ *            schema:
+ *              $ref: '#/definitions/Error_404'
+ *            example:
+ *              code: 'NOT FOUND'
  *          406: 
  *            description: sql injection 발생
+ *            schema:
+ *              $ref: '#/definitions/Error_406'
+ *            example:
+ *              code: 'INJECTION ERROR'
  *          501: 
  *            description: index값 오류
+ *            schema:
+ *              $ref: '#/definitions/Error_501'
+ *            example:
+ *              code: '501 ERROR'
+ *              errorMessage: 'PARAMETER IS EMPTY'
  * 
  * definitions:
  *   Affiliate_one:
@@ -74,30 +89,29 @@ const validate = require("../core/validate");
  *         type: string
  *         enum: [y, n]
  *         description: 신규등록업체 유무
- * 
  */
 router.get("/:index", function(req, res){
     const index = req.params.index;
+
+    if (validate.isEmpty(index)) {
+        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        return;
+    }
 
     if (!validate.checkInjection(index)) {
         response_handler.response406Error(res);
         return;
     }
-
-    if (validate.isEmpty(index)) {
-        response_handler.response501Error(res);
-        return;
-    }
     
     if (!validate.validateRequestInteger(index)) {
-        response_handler.response501Error(res);
+        response_handler.response501Error(res, error_string.VALIDATION_ERROR_MESSAGE);
         return;
     }
 
     affiliate_repository.findOneAffiliate(index, function(err, result){
-        if(err) throw err;
-        res.send(result);
-    })
+        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+        else res.send(result);
+    });
 });
 
 module.exports = router;
