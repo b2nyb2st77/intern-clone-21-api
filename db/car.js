@@ -122,10 +122,11 @@ module.exports = {
             }
         }
         else if (order === 'price') {
-            const sql_price = `ORDER BY FIELD(c.c_name, (SELECT group_concat(S.name) 
-                                                         FROM (SELECT c.c_name name
-                                                               FROM rentcar_status rs, car c 
-                                                               WHERE rs.rs_c_index = c.c_index `;
+            const sql_price = `
+                ORDER BY FIELD(c.c_name, (SELECT group_concat(DISTINCT(QUOTE(S.name)) ORDER BY S.min)
+                                          FROM (SELECT c.c_name name, min(car_price) min
+                                                FROM rentcar_status rs, car c 
+                                                WHERE rs.rs_c_index = c.c_index `;
 
             switch (carType) {
                 case 'all':
