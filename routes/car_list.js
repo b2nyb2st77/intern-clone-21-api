@@ -5,17 +5,6 @@ const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error_string = require("../core/error_string");
 
-const carTypes = [
-    'all',
-    'elec',
-    'small',
-    'middle',
-    'big',
-    'suv',
-    'rv',
-    'import',
-];
-
 /**
  * @swagger
  * paths:
@@ -31,11 +20,6 @@ const carTypes = [
  *          in: query
  *          description: 정렬 타입
  *          required: true
- *          type: string
- *        - name: type
- *          in: query
- *          description: 차종
- *          required: false
  *          type: string
  *        - name: location
  *          in: query
@@ -191,30 +175,22 @@ const carTypes = [
  */
 router.get("/", function(req, res){
     const order = req.query.order;
-    let carType = req.query.type;
     const location = decodeURIComponent(req.query.location);
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
-    
-    if(validate.isEmpty(carType)) carType = "all";
     
     if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
         response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
     
-    if (!validate.checkInjection(order) || !validate.checkInjection(carType) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
+    if (!validate.checkInjection(order) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
         response_handler.response406Error(res);
         return;
     }
     
     if (!(order === "type" || order === "price")) {
         response_handler.response501Error(res, "ORDER " + error_string.TYPE_ERROR_MESSAGE);
-        return;
-    }
-
-    if (!~carTypes.indexOf(carType)) {
-        response_handler.response501Error(res, "TYPE " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
     
@@ -240,9 +216,8 @@ router.get("/", function(req, res){
         return;
     }
     
-    car_repository.findCars(
+    const execSql = car_repository.findCars(
         order,
-        carType,
         location,
         startTime,
         endTime,
@@ -251,6 +226,8 @@ router.get("/", function(req, res){
             else res.send(result);
         }
     );
+
+    console.log(execSql.sql);
 });
 
 module.exports = router;

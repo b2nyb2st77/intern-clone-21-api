@@ -5,7 +5,7 @@ const number = require("../core/number_string");
 const time = require("../core/calculate_time");
 
 module.exports = {
-    findCars: (order, carType, location, startTime, endTime, callback) => {
+    findCars: (order, location, startTime, endTime, callback) => {
         const start = time.calculateMillisecondsOfTime(startTime);
         const end = time.calculateMillisecondsOfTime(endTime);
         const [day, hour] =  time.calculateDayAndHourForPrice(start, end);
@@ -85,95 +85,10 @@ module.exports = {
                                                           OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'))) `;
 
         if (order === 'type') {
-            switch (carType) {
-                case 'all':
-                    sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name, a.a_name ASC`;
-                    break;
-                case 'elec':
-                    sql += `AND c.c_fuel = '전기'
-                            ORDER BY c.c_name, a.a_name ASC`;
-                    break;
-                case 'small':
-                    sql += `AND c.c_type IN ('경형', '소형')
-                            ORDER BY FIELD(c.c_type, '경형', '소형'), c.c_name, a.a_name ASC`;
-                    break;
-                case 'middle':
-                    sql += `AND c.c_type = '준중형'
-                            ORDER BY c.c_name, a.a_name ASC`;
-                    break;
-                case 'big':
-                    sql += `AND c.c_type IN ('중형', '대형')
-                            ORDER BY FIELD(c.c_type, '중형', '대형'), c.c_name, a.a_name ASC`;
-                    break;
-                case 'suv':
-                    sql += `AND c.c_type = 'SUV'
-                            ORDER BY c.c_name, a.a_name ASC`;
-                    break;
-                case 'rv':
-                    sql += `AND c.c_type = 'RV'
-                            ORDER BY c.c_name, a.a_name ASC`;
-                    break;
-                case 'import':
-                    sql += `AND c.c_type = '수입'
-                            ORDER BY c.c_name, a.a_name ASC`;
-                    break;
-                default:
-                    break;
-            }
+            sql += `ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name, a.a_name ASC`;
         }
         else if (order === 'price') {
-            const sql_price = `
-                ORDER BY FIELD(c.c_name, (SELECT group_concat(DISTINCT(QUOTE(S.name)) ORDER BY S.min)
-                                          FROM (SELECT c.c_name name, min(car_price) min
-                                                FROM rentcar_status rs, car c 
-                                                WHERE rs.rs_c_index = c.c_index `;
-
-            switch (carType) {
-                case 'all':
-                    sql += sql_price;
-                    break;
-                case 'elec':
-                    sql += ` AND c.c_fuel = '전기' `
-                           + sql_price
-                           + ` AND c.c_fuel = '전기' `;
-                    break;
-                case 'small':
-                    sql += ` AND c.c_type IN ('경형', '소형') `
-                            + sql_price
-                            + ` AND c.c_type IN ('경형', '소형') `;
-                    break;
-                case 'middle':
-                    sql += ` AND c.c_type = '준중형' `
-                            + sql_price
-                            + ` AND c.c_type = '준중형' `;
-                    break;
-                case 'big':
-                    sql += ` AND c.c_type IN ('중형', '대형') `
-                            + sql_price
-                            + ` AND c.c_type IN ('중형', '대형') `;
-                    break;
-                case 'suv':
-                    sql += ` AND c.c_type = 'SUV' `
-                            + sql_price
-                            + ` AND c.c_type = 'SUV' `;
-                    break;
-                case 'rv':
-                    sql += ` AND c.c_type = 'RV' `
-                            + sql_price
-                            + ` AND c.c_type = 'RV' `;
-                    break;
-                case 'import':
-                    sql += ` AND c.c_type = '수입' `
-                            + sql_price
-                            + ` AND c.c_type = '수입' `;
-                    break;
-                default:
-                    break;
-            }
-            
-            sql +=  `GROUP BY c.c_name
-                     ORDER BY min(car_price) ASC
-                     ) AS S)), car_price, a.a_name ASC`;
+            sql += `ORDER BY c.c_name, a.a_name, car_price`;
         }
 
         return connection.query(sql, function(err, result){
