@@ -29,7 +29,10 @@ const error_string = require("../core/error_string");
  *            example:
  *              l_index: 1
  *              l_name: '서울역'
+ *              l_type: 'ktx'
+ *              l_popular_or_not: 'n'
  *              l_immediate_or_not: 'y'
+ *              l_subname: ''
  *          404: 
  *            description: 지역 리스트 검색하기 실패
  *            schema:
@@ -60,6 +63,13 @@ const error_string = require("../core/error_string");
  *       l_name:
  *         type: string
  *         description: 지역 이름
+ *       l_type:
+ *         type: string
+ *         description: 지역 종류
+ *       l_popular_or_not:
+ *         type: string
+ *         enum: [y, n]
+ *         description: 인기지역 유무
  *       l_immediate_or_not:
  *         type: string
  *         enum: [y, n]
