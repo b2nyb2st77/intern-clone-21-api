@@ -4,6 +4,7 @@ const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error_string = require("../core/error_string");
+const calculate = require("../core/calculate_price");
 
 /**
  * @swagger
@@ -16,11 +17,6 @@ const error_string = require("../core/error_string");
  *        produces:
  *        - applicaion/json
  *        parameters:
- *        - name: order
- *          in: query
- *          description: 정렬 타입
- *          required: true
- *          type: string
  *        - name: location
  *          in: query
  *          description: 지역
@@ -174,23 +170,17 @@ const error_string = require("../core/error_string");
  *         description: 렌트가능차량 가격
  */
 router.get("/", function(req, res){
-    const order = req.query.order;
     const location = decodeURIComponent(req.query.location);
     const startTime = req.query.startTime;
     const endTime = req.query.endTime;
     
-    if (validate.isEmpty(order) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
+    if (validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
         response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
     
-    if (!validate.checkInjection(order) || !validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
+    if (!validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
         response_handler.response406Error(res);
-        return;
-    }
-    
-    if (!(order === "type" || order === "price")) {
-        response_handler.response501Error(res, "ORDER " + error_string.TYPE_ERROR_MESSAGE);
         return;
     }
     
@@ -215,35 +205,33 @@ router.get("/", function(req, res){
         response_handler.response501Error(res, error_string.VALIDATION_ERROR_MESSAGE);
         return;
     }
-    
-    car_repository.findCars(
-        order,
-        location,
-        startTime,
-        endTime,
-        function(err, result){
+
+    car_repository.findCars(location, startTime, endTime, function(err, result){
             if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
             else {
-                const car_list = result;
+                let car_list = result;
 
-                for (let i = 0; i < car_list.length; i++) {
-                    const c_index = car_list[i].c_index;
-                    const a_index = car_list[i].a_index;
-                    let price;
+                getPrice(location, startTime, endTime, function(result){
+                    const price_list = result;
+                    for (let i = 0; i < car_list.length; i++) {
+                        car_list[i].car_price = price_list[i].price;
+                    }
+                    res.send(car_list);
+                })
 
-                    car_repository.findPriceListOfCar(c_index, a_index, function(err, result){
-                        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-                        else {
-                            price = car_repository.calculatePriceOfCar(startTime, endTime, result[0]);
-                            car_list[i].car_price = price;
-                            res.send(car_list[i]);
-                        }    
-                    });
-                }
-                res.send(car_list);
             }
         }
     );
-});
+    });
+    
+    function getPrice(location, startTime, endTime, callback){
+        car_repository.findPriceListOfCars(location, function(err, result){
+            if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+            else {
+                const price_list = calculate.calculatePriceOfCars(startTime, endTime, result);
+                callback(price_list);
+            }    
+        });
+    }
 
-module.exports = router;
+    module.exports = router;
