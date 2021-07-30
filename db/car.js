@@ -19,7 +19,7 @@ module.exports = {
                                                          AND rr.rr_cancel_or_not = 'n'
                                                          AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
                                                                OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}')))
-                     ORDER BY c.c_name, a.a_name ASC`;
+                     ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name, a.a_name ASC`;
 
         return connection.query(sql, function(err, result){
             if(err) callback(err);
@@ -74,7 +74,7 @@ module.exports = {
         const [today_date, today_day] = time.calculateDayAndDateOfToday();
         const weekdays = [1, 2, 3, 4, 5];
 
-        let sql = `SELECT p.*, c.c_name, a.a_name
+        let sql = `SELECT p.*, c.c_name, a.a_name, c.c_type
                    FROM rentcar_status rs, car c, affiliate a, price p, location l
                    WHERE rs.rs_c_index = c.c_index
                          AND rs.rs_a_index = a.a_index
@@ -94,7 +94,7 @@ module.exports = {
         if (!~weekdays.indexOf(today_day)) sql += `'weekend' END`;
         else sql +=  `'weekdays' END`;
 
-        sql += ` ORDER BY c.c_name, a.a_name ASC`;
+        sql += ` ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name, a.a_name ASC`;
 
         return connection.query(sql, function(err, result){
             if(err) callback(err);
