@@ -110,7 +110,7 @@ router.get("/", function(req, res){
     const searchWord = decodeURIComponent(req.query.searchWord);
 
     if (validate.isEmpty(searchWord)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 

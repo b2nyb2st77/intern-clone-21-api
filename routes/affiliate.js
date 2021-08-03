@@ -94,7 +94,7 @@ router.get("/:index", function(req, res){
     const index = req.params.index;
 
     if (validate.isEmpty(index)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 
@@ -104,7 +104,7 @@ router.get("/:index", function(req, res){
     }
     
     if (!validate.validateRequestInteger(index)) {
-        response_handler.response501Error(res, error_string.VALIDATION_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, 412, error_string.VALIDATION_ERROR_MESSAGE);
         return;
     }
 

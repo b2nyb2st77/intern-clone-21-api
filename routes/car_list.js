@@ -175,7 +175,7 @@ router.get("/", function(req, res){
     const endTime = req.query.endTime;
     
     if (validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.response501Error(res, error_string.PARAMETER_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
     
@@ -186,52 +186,51 @@ router.get("/", function(req, res){
     
     switch (validate.checkTime(startTime, endTime)) {
         case error_string.OVER_TIME_ERROR:
-            response_handler.response501Error(res, error_string.OVER_TIME_ERROR_MESSAGE);
+            response_handler.responseValidateError(res, 412, error_string.OVER_TIME_ERROR_MESSAGE);
             return;
         case error_string.TIME_DIFFERENCE_ERROR:
-            response_handler.response501Error(res, error_string.TIME_DIFFERENCE_ERROR_MESSAGE);
+            response_handler.responseValidateError(res, 412, error_string.TIME_DIFFERENCE_ERROR_MESSAGE);
             return;
         case error_string.DATE_DIFFERENCE_ERROR:
-            response_handler.response501Error(res, error_string.DATE_DIFFERENCE_ERROR_MESSAGE);
+            response_handler.responseValidateError(res, 412, error_string.DATE_DIFFERENCE_ERROR_MESSAGE);
             return;
         case error_string.PAST_TIME_ERROR:
-            response_handler.response501Error(res, error_string.PAST_TIME_ERROR_MESSAGE);
+            response_handler.responseValidateError(res, 412, error_string.PAST_TIME_ERROR_MESSAGE);
             return;
         default:
             break;    
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.response501Error(res, error_string.VALIDATION_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, 412, error_string.VALIDATION_ERROR_MESSAGE);
         return;
     }
 
     car_repository.findCars(location, startTime, endTime, function(err, result){
-            if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-            else {
-                let car_list = result;
+        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+        else {
+            let car_list = result;
 
-                getPrice(location, startTime, endTime, function(result){
-                    const price_list = result;
-                    for (let i = 0; i < car_list.length; i++) {
-                        car_list[i].car_price = price_list[i].price;
-                    }
-                    res.send(car_list);
-                })
+            getPrice(location, startTime, endTime, function(result){
+                const price_list = result;
+                for (let i = 0; i < car_list.length; i++) {
+                    car_list[i].car_price = price_list[i].price;
+                }
+                res.send(car_list);
+            })
 
-            }
         }
-    );
     });
+});
     
-    function getPrice(location, startTime, endTime, callback){
-        car_repository.findPriceListOfCars(location, function(err, result){
-            if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-            else {
-                const price_list = calculate.calculatePriceOfCars(startTime, endTime, result);
-                callback(price_list);
-            }    
-        });
-    }
+function getPrice(location, startTime, endTime, callback){
+    car_repository.findPriceListOfCars(location, function(err, result){
+        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+        else {
+            const price_list = calculate.calculatePriceOfCars(startTime, endTime, result);
+            callback(price_list);
+        }    
+    });
+}
 
-    module.exports = router;
+module.exports = router;

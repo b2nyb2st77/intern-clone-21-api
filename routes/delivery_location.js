@@ -66,7 +66,7 @@ router.get("/", function(req, res){
     const affiliateName = decodeURIComponent(req.query.affiliateName);
 
     if (validate.isEmpty(affiliateName, error_string.PARAMETER_ERROR_MESSAGE)) {
-        response_handler.response501Error(res);
+        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
         return;
     }
 
