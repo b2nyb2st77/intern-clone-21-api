@@ -59,6 +59,8 @@ const calculate = require("../core/calculate_price");
  *              a_grade: 4.9
  *              a_l_index: 13
  *              a_new_or_not: 'n'
+ *              a_open_time: 08:00:00
+ *              a_close_time: 22:00:00
  *              car_price: 55000
  *          404: 
  *            description: 차량 리스트 불러오기 실패
@@ -103,6 +105,8 @@ const calculate = require("../core/calculate_price");
  *       - a_grade
  *       - a_l_index
  *       - a_new_or_not
+ *       - a_open_time
+ *       - a_close_time
  *       - rs_price
  *     properties:
  *       c_index:
@@ -165,6 +169,14 @@ const calculate = require("../core/calculate_price");
  *         type: string
  *         enum: [y, n]
  *         description: 신규등록업체 유무
+ *       a_open_time:
+ *         type: string
+ *         format: time
+ *         description: 업체 오픈 시간
+ *       a_close_time:
+ *         type: string
+ *         format: time
+ *         description: 업체 마감 시간
  *       car_price:
  *         type: integer
  *         description: 렌트가능차량 가격
@@ -224,7 +236,7 @@ router.get("/", function(req, res){
 });
     
 function getPrice(location, startTime, endTime, callback){
-    car_repository.findPriceListOfCars(location, function(err, result){
+    car_repository.findPriceListOfCars(location, startTime, endTime, function(err, result){
         if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
         else {
             const price_list = calculate.calculatePriceOfCars(startTime, endTime, result);

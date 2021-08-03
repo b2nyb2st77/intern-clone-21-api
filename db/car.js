@@ -12,6 +12,8 @@ module.exports = {
                            AND a.a_l_index = l.l_index
                            AND (l.l_name = '${location}'
                                 OR l.l_subname = '${location}')
+                           AND a.a_open_time <= '${startTime}' AND a.a_close_time >= '${startTime}'
+                           AND a.a_open_time <= '${endTime}' AND a.a_close_time >= '${endTime}'
                            AND rs.rs_index NOT IN (SELECT distinct rr.rr_rs_index
                                                    FROM rentcar_status rs, rentcar_reservation rr
                                                    WHERE rs.rs_index = rr.rr_rs_index
@@ -37,6 +39,8 @@ module.exports = {
                                   AND rr.rr_cancel_or_not = 'n'
                                   AND (l.l_name = '${location}'
                                        OR l.l_subname = '${location}')
+                                  AND a.a_open_time <= '${startTime}' AND a.a_close_time >= '${startTime}'
+                                  AND a.a_open_time <= '${endTime}' AND a.a_close_time >= '${endTime}'
                                   AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
                                         OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'))
                             GROUP BY a.a_name) AS S;`;
@@ -51,6 +55,8 @@ module.exports = {
                             AND rr.rr_cancel_or_not = 'n'
                             AND (l.l_name = '${location}'
                                  OR l.l_subname = '${location}')
+                            AND a.a_open_time <= '${startTime}' AND a.a_close_time >= '${startTime}'
+                            AND a.a_open_time <= '${endTime}' AND a.a_close_time >= '${endTime}'
                             AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
                                   OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}'));`;
 
@@ -69,7 +75,7 @@ module.exports = {
             else callback(null, result);
         });
     },
-    findPriceListOfCars: (location, callback) => {
+    findPriceListOfCars: (location, startTime, endTime, callback) => {
         const [today_date, today_day] = time.calculateDayAndDateOfToday();
         const weekdays = [1, 2, 3, 4, 5];
 
@@ -80,6 +86,14 @@ module.exports = {
                          AND a.a_l_index = l.l_index
                          AND (l.l_name = '${location}'
                               OR l.l_subname = '${location}')
+                         AND a.a_open_time <= '${startTime}' AND a.a_close_time >= '${startTime}'
+                         AND a.a_open_time <= '${endTime}' AND a.a_close_time >= '${endTime}'
+                         AND rs.rs_index NOT IN (SELECT distinct rr.rr_rs_index
+                                                 FROM rentcar_status rs, rentcar_reservation rr
+                                                 WHERE rs.rs_index = rr.rr_rs_index
+                                                       AND rr.rr_cancel_or_not = 'n'
+                                                       AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}')
+                                                             OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}')))
                          AND p.p_rs_index = rs.rs_index
                          AND p.p_type = CASE
                                             WHEN (SELECT COUNT(*)

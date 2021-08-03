@@ -34,6 +34,8 @@ const error_string = require("../core/error_string");
  *              a_grade: 4.9
  *              a_l_index: 13
  *              a_new_or_not: 'n'
+ *              a_open_time: 08:00:00
+ *              a_close_time: 22:00:00
  *          404: 
  *            description: 업체 정보 불러오기 실패
  *            schema:
@@ -65,6 +67,8 @@ const error_string = require("../core/error_string");
  *       - a_grade
  *       - a_l_index
  *       - a_new_or_not
+ *       - a_open_time
+ *       - a_close_time
  *     properties:
  *       a_index:
  *         type: integer
@@ -89,6 +93,14 @@ const error_string = require("../core/error_string");
  *         type: string
  *         enum: [y, n]
  *         description: 신규등록업체 유무
+ *       a_open_time:
+ *         type: string
+ *         format: time
+ *         description: 업체 오픈 시간
+ *       a_close_time:
+ *         type: string
+ *         format: time
+ *         description: 업체 마감 시간
  */
 router.get("/:index", function(req, res){
     const index = req.params.index;
