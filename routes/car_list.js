@@ -107,7 +107,7 @@ const calculate = require("../core/calculate_price");
  *       - a_new_or_not
  *       - a_open_time
  *       - a_close_time
- *       - rs_price
+ *       - car_price
  *     properties:
  *       c_index:
  *         type: integer
