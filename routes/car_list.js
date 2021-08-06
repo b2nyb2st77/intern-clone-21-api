@@ -197,7 +197,7 @@ router.get("/", function(req, res){
     }
     
     if (!validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
-        response_handler.response406Error(res);
+        response_handler.responseInjectionError(res);
         return;
     }
     
@@ -223,25 +223,39 @@ router.get("/", function(req, res){
         return;
     }
 
-    car_repository.findCars(location, startTime, endTime, function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else {
-            let car_list = result;
+    const getCarList = new Promise(function(resolve, reject) {
+        car_repository.findCars(location, startTime, endTime, function(err, result){
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
 
-            car_repository.findPriceListOfCars(location, startTime, endTime, function(err, price_list){
-                if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-                else {
-                    car_repository.findPeakSeasonList(function(err, peak_season_list){
-                        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-                        else {
-                            car_list = calculate.calculatePriceOfCars(startTime, endTime, car_list, price_list, peak_season_list);
-                            res.send(car_list);
-                        }
-                    });
-                }
-            });
+    const getPriceList = new Promise(function(resolve, reject) {
+        car_repository.findPriceListOfCars(location, startTime, endTime, function(err, result){
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
 
+    const getPeakSeasonList = new Promise(function(resolve, reject) {
+        car_repository.findPeakSeasonList(function(err, result){
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    Promise.all([getCarList, getPriceList, getPeakSeasonList])
+    .then((values) => {
+        if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null && values[2] != undefined && values[2] != null) {
+            car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1], values[2]);
+            res.send(car_list);
         }
+        else {
+            res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
+        }
+    })
+    .catch((error) => {
+        res.status(404).send({code: "SQL ERROR", errorMessage: error});
     });
 });
 

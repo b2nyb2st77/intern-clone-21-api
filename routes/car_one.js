@@ -123,7 +123,7 @@ router.get("/:index", function(req, res){
     }
     
     if (!validate.checkInjection(index)) {
-        response_handler.response406Error(res);
+        response_handler.responseInjectionError(res);
         return;
     }
 

@@ -91,7 +91,7 @@ router.get("/", function(req, res){
     }
 
     if (!validate.checkInjection(carName) || !validate.checkInjection(location) || !validate.checkInjection(startTime) ||!validate.checkInjection(endTime)) {
-        response_handler.response406Error(res);
+        response_handler.responseInjectionError(res);
         return;
     }
     

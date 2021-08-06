@@ -71,7 +71,7 @@ router.get("/", function(req, res){
     }
 
     if (!validate.checkInjection(affiliateName)) {
-        response_handler.response406Error(res);
+        response_handler.responseInjectionError(res);
         return;
     }
     
