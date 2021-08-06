@@ -99,14 +99,14 @@ router.get("/", function(req, res){
         case error_string.OVER_TIME_ERROR:
             response_handler.responseValidateError(res, 412, error_string.OVER_TIME_ERROR_MESSAGE);
             return;
+        case error_string.PAST_TIME_ERROR:
+            response_handler.responseValidateError(res, 412, error_string.PAST_TIME_ERROR_MESSAGE);
+            return;
         case error_string.TIME_DIFFERENCE_ERROR:
             response_handler.responseValidateError(res, 412, error_string.TIME_DIFFERENCE_ERROR_MESSAGE);
             return;
         case error_string.DATE_DIFFERENCE_ERROR:
             response_handler.responseValidateError(res, 412, error_string.DATE_DIFFERENCE_ERROR_MESSAGE);
-            return;
-        case error_string.PAST_TIME_ERROR:
-            response_handler.responseValidateError(res, 412, error_string.PAST_TIME_ERROR_MESSAGE);
             return;
         default:
             break;    

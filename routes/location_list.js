@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const location_repository = require("../db/location");
-const response_handler = require("../core/responseHandler");
-const validate = require("../core/validate");
-const error_string = require("../core/error_string");
 
 /**
  * @swagger

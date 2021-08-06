@@ -61,6 +61,7 @@ const calculate = require("../core/calculate_price");
  *              a_new_or_not: 'n'
  *              a_open_time: 08:00:00
  *              a_close_time: 22:00:00
+ *              rs_index: 1
  *              car_price: 55000
  *          404: 
  *            description: 차량 리스트 불러오기 실패
@@ -107,6 +108,7 @@ const calculate = require("../core/calculate_price");
  *       - a_new_or_not
  *       - a_open_time
  *       - a_close_time
+ *       - rs_index
  *       - car_price
  *     properties:
  *       c_index:
@@ -177,6 +179,9 @@ const calculate = require("../core/calculate_price");
  *         type: string
  *         format: time
  *         description: 업체 마감 시간
+ *       rs_index:
+ *         type: integer
+ *         description: 렌트가능차량 고유번호
  *       car_price:
  *         type: integer
  *         description: 렌트가능차량 가격
@@ -200,14 +205,14 @@ router.get("/", function(req, res){
         case error_string.OVER_TIME_ERROR:
             response_handler.responseValidateError(res, 412, error_string.OVER_TIME_ERROR_MESSAGE);
             return;
+        case error_string.PAST_TIME_ERROR:
+            response_handler.responseValidateError(res, 412, error_string.PAST_TIME_ERROR_MESSAGE);
+            return;
         case error_string.TIME_DIFFERENCE_ERROR:
             response_handler.responseValidateError(res, 412, error_string.TIME_DIFFERENCE_ERROR_MESSAGE);
             return;
         case error_string.DATE_DIFFERENCE_ERROR:
             response_handler.responseValidateError(res, 412, error_string.DATE_DIFFERENCE_ERROR_MESSAGE);
-            return;
-        case error_string.PAST_TIME_ERROR:
-            response_handler.responseValidateError(res, 412, error_string.PAST_TIME_ERROR_MESSAGE);
             return;
         default:
             break;    
@@ -223,26 +228,21 @@ router.get("/", function(req, res){
         else {
             let car_list = result;
 
-            getPrice(location, startTime, endTime, function(result){
-                const price_list = result;
-                for (let i = 0; i < car_list.length; i++) {
-                    car_list[i].car_price = price_list[i].price;
+            car_repository.findPriceListOfCars(location, startTime, endTime, function(err, price_list){
+                if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+                else {
+                    car_repository.findPeakSeasonList(function(err, peak_season_list){
+                        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
+                        else {
+                            car_list = calculate.calculatePriceOfCars(startTime, endTime, car_list, price_list, peak_season_list);
+                            res.send(car_list);
+                        }
+                    });
                 }
-                res.send(car_list);
-            })
+            });
 
         }
     });
 });
-    
-function getPrice(location, startTime, endTime, callback){
-    car_repository.findPriceListOfCars(location, startTime, endTime, function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else {
-            const price_list = calculate.calculatePriceOfCars(startTime, endTime, result);
-            callback(price_list);
-        }    
-    });
-}
 
 module.exports = router;
