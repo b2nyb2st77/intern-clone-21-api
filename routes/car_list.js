@@ -3,7 +3,7 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
-const error_string = require("../core/error_string");
+const error = require("../core/error");
 const calculate = require("../core/calculate_price");
 
 /**
@@ -192,7 +192,7 @@ router.get("/", function(req, res){
     const endTime = req.query.endTime;
     
     if (validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
         return;
     }
     
@@ -202,24 +202,24 @@ router.get("/", function(req, res){
     }
     
     switch (validate.checkTime(startTime, endTime)) {
-        case error_string.OVER_TIME_ERROR:
-            response_handler.responseValidateError(res, 412, error_string.OVER_TIME_ERROR_MESSAGE);
+        case error.OVER_TIME_ERROR:
+            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.OVER_TIME_ERROR_MESSAGE);
             return;
-        case error_string.PAST_TIME_ERROR:
-            response_handler.responseValidateError(res, 412, error_string.PAST_TIME_ERROR_MESSAGE);
+        case error.PAST_TIME_ERROR:
+            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.PAST_TIME_ERROR_MESSAGE);
             return;
-        case error_string.TIME_DIFFERENCE_ERROR:
-            response_handler.responseValidateError(res, 412, error_string.TIME_DIFFERENCE_ERROR_MESSAGE);
+        case error.TIME_DIFFERENCE_ERROR:
+            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.TIME_DIFFERENCE_ERROR_MESSAGE);
             return;
-        case error_string.DATE_DIFFERENCE_ERROR:
-            response_handler.responseValidateError(res, 412, error_string.DATE_DIFFERENCE_ERROR_MESSAGE);
+        case error.DATE_DIFFERENCE_ERROR:
+            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.DATE_DIFFERENCE_ERROR_MESSAGE);
             return;
         default:
             break;    
     }
     
     if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.responseValidateError(res, 412, error_string.VALIDATION_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
         return;
     }
 

@@ -3,7 +3,7 @@ const router = express.Router();
 const dl_repository = require("../db/delivery_location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
-const error_string = require("../core/error_string");
+const error = require("../core/error");
 
 /**
  * @swagger
@@ -65,8 +65,8 @@ const error_string = require("../core/error_string");
 router.get("/", function(req, res){
     const affiliateName = decodeURIComponent(req.query.affiliateName);
 
-    if (validate.isEmpty(affiliateName, error_string.PARAMETER_ERROR_MESSAGE)) {
-        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
+    if (validate.isEmpty(affiliateName)) {
+        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
         return;
     }
 

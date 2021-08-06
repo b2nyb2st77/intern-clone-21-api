@@ -3,7 +3,7 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
-const error_string = require("../core/error_string");
+const error = require("../core/error");
 
 /**
  * @swagger
@@ -118,7 +118,7 @@ router.get("/:index", function(req, res){
     const index = req.params.index;
 
     if (validate.isEmpty(index)) {
-        response_handler.responseValidateError(res, 411, error_string.PARAMETER_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
         return;
     }
     
@@ -128,7 +128,7 @@ router.get("/:index", function(req, res){
     }
 
     if (!validate.validateRequestInteger(index)) {
-        response_handler.responseValidateError(res, 412, error_string.VALIDATION_ERROR_MESSAGE);
+        response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
         return;
     }
     

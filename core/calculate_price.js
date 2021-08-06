@@ -1,6 +1,6 @@
 const express = require("express");
 const dayjs = require('dayjs');
-const number = require("./number_string");
+const number = require("./number");
 
 module.exports = {
     calculatePriceOfCars: (startTime, endTime, car_list, price_list, peak_season_list) => {
@@ -114,21 +114,18 @@ module.exports = {
                     else number_of_peak_season_days++;
                 }
             }
-            
+
+            if (isDayPeakSeason) continue;
         }
         
-        if (!isDayPeakSeason) {
-            const day = k.day();
-            const weekdays = [1, 2, 3, 4, 5];
+        const day = k.day();
+        const weekdays = [1, 2, 3, 4, 5];
 
-            if (isDateSame(k, end_date)) {
-                if (!~weekdays.indexOf(day)) type_of_last_day = 'weekend';
-                else type_of_last_day = 'weekdays';
-            }
-            else {
-                if (!~weekdays.indexOf(day)) number_of_weekend++;
-                else number_of_weekdays++;
-            }               
+        if (isDateSame(k, end_date)) {
+            type_of_last_day = (!~weekdays.indexOf(day)) ? 'weekend' : 'weekdays';
+        }
+        else {
+            (!~weekdays.indexOf(day)) ? number_of_weekend++ : number_of_weekdays++;
         }
     }
 
@@ -136,11 +133,11 @@ module.exports = {
  }
 
  function isDateSame(date1, date2) {
-    return (date1.year() == date2.year() && date1.month() == date2.month() && date1.date() == date2.date()) ? true : false;
+    return (date1.year() == date2.year() && date1.month() == date2.month() && date1.date() == date2.date());
  }
 
  function isDateBetweenStartDateAndEndDate(date, start, end) { 
-    return (date.diff(start, 'day') >= 0 && end.diff(date, 'day') >= 0) ? true : false;
+    return (date.diff(start, 'day') >= 0 && end.diff(date, 'day') >= 0);
  }
  
  function calculate_day_price(day, number_of_weekend, number_of_weekdays, number_of_peak_season_days, weekend_price, weekdays_price, peak_season_price) {
@@ -151,17 +148,17 @@ module.exports = {
         total += number_of_weekdays * weekdays_price[0].p_7_days;
         total += number_of_peak_season_days * peak_season_price[0].p_7_days;
     }
-    if (day == 5 || day == 6) {
+    else if (day == 5 || day == 6) {
         total += number_of_weekend * weekend_price[0].p_5_or_6_days;
         total += number_of_weekdays * weekdays_price[0].p_5_or_6_days;
         total += number_of_peak_season_days * peak_season_price[0].p_5_or_6_days;
     }
-    if (day == 3 || day == 4) {
+    else if (day == 3 || day == 4) {
         total += number_of_weekend * weekend_price[0].p_3_or_4_days;
         total += number_of_weekdays * weekdays_price[0].p_3_or_4_days;
         total += number_of_peak_season_days * peak_season_price[0].p_3_or_4_days;
     }
-    if (day == 1 || day == 2) {
+    else if (day == 1 || day == 2) {
         total += number_of_weekend * weekend_price[0].p_1_or_2_days;
         total += number_of_weekdays * weekdays_price[0].p_1_or_2_days;
         total += number_of_peak_season_days * peak_season_price[0].p_1_or_2_days;

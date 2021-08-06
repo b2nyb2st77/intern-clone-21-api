@@ -1,6 +1,6 @@
 const express = require("express");
 const dayjs = require('dayjs');
-const number = require("./number_string");
+const number = require("./number");
 
 module.exports = {
     checkIfTimeDiffIsLessThanMinimumHoursOfRent: (startTime, endTime) => {
