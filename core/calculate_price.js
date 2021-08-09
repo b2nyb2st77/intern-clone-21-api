@@ -11,7 +11,9 @@ module.exports = {
 
         if (start_date.minute() != end_date.minute()) hour++;
 
-        for (let i = 0; i < car_list.length; i++) {
+        const length = car_list.length;
+
+        for (let i = 0; i < length; i++) {
             let total = 0;
 
             let price_list_of_car = find_price_list_of_car(car_list, price_list, i);
@@ -48,8 +50,9 @@ module.exports = {
 
  function find_price_list_of_car(car_list, price_list, i) {
     let price_list_of_car = [];
+    const length = price_list.length;
 
-    for (let k = 0; k < price_list.length; k++) {
+    for (let k = 0; k < length; k++) {
         if(car_list[i].rs_index == price_list[k].p_rs_index) {
             price_list_of_car.push(price_list[k]);
         }
@@ -62,8 +65,9 @@ module.exports = {
     let weekend_price = [];
     let weekdays_price = [];
     let peak_season_price = [];
+    const length = price_list_of_car.length;
 
-    for (let k = 0; k < price_list_of_car.length; k++) {
+    for (let k = 0; k < length; k++) {
         if (price_list_of_car[k].p_type == 'weekend') {
             weekend_price.push(price_list_of_car[k]);
         }
@@ -80,8 +84,9 @@ module.exports = {
 
  function find_peak_seasons_of_affiliate(car_list, peak_season_list, i) {
     let peak_season_of_affiliate = [];
+    const length = peak_season_list.length;
 
-    for (let k = 0; k < peak_season_list.length; k++) {
+    for (let k = 0; k < length; k++) {
         if(car_list[i].a_index == peak_season_list[k].ps_a_index) {
             peak_season_of_affiliate.push(peak_season_list[k]);
         }
@@ -95,6 +100,9 @@ module.exports = {
     let number_of_weekdays = 0;
     let number_of_weekend = 0;
     let type_of_last_day = '';
+    
+    const weekdays = [1, 2, 3, 4, 5];
+    const length = peak_season_of_affiliate.length;
 
     for (let k = start_date; k <= end_date; k = k.add(1, 'day')) {
         
@@ -102,7 +110,7 @@ module.exports = {
 
         if (peak_season_of_affiliate != null && peak_season_of_affiliate != undefined) {
 
-            for (let j = 0; j < peak_season_of_affiliate.length; j++) {
+            for (let j = 0; j < length; j++) {
                 
                 const ps_start_date = dayjs(peak_season_of_affiliate[j].ps_start_date);
                 const ps_end_date = dayjs(peak_season_of_affiliate[j].ps_end_date);
@@ -119,7 +127,6 @@ module.exports = {
         }
         
         const day = k.day();
-        const weekdays = [1, 2, 3, 4, 5];
 
         if (isDateSame(k, end_date)) {
             type_of_last_day = (!~weekdays.indexOf(day)) ? 'weekend' : 'weekdays';
