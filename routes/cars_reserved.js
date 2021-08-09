@@ -3,6 +3,7 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const time = require("../application/check_time");
 const error = require("../core/error");
 
 /**
@@ -82,8 +83,7 @@ const error = require("../core/error");
 router.get("/", function(req, res){
     const carName = decodeURIComponent(req.query.carName);
     const location = decodeURIComponent(req.query.location);
-    const startTime = req.query.startTime;
-    const endTime = req.query.endTime;
+    const { startTime, endTime } = req.query;
 
     if (validate.isEmpty(carName) || validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
         response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
@@ -95,27 +95,12 @@ router.get("/", function(req, res){
         return;
     }
     
-    switch (validate.checkTime(startTime, endTime)) {
-        case error.OVER_TIME_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.OVER_TIME_ERROR_MESSAGE);
-            return;
-        case error.PAST_TIME_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.PAST_TIME_ERROR_MESSAGE);
-            return;
-        case error.TIME_DIFFERENCE_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.TIME_DIFFERENCE_ERROR_MESSAGE);
-            return;
-        case error.DATE_DIFFERENCE_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.DATE_DIFFERENCE_ERROR_MESSAGE);
-            return;
-        default:
-            break;    
-    }
-    
     if (!validate.validateRequestDatetime(startTime, endTime)) {
         response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
         return;
     }
+
+    if(!time.checkTimeError(startTime, endTime, res)) return;
 
     car_repository.findReservedCar(
         carName, 

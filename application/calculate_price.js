@@ -1,15 +1,17 @@
 const express = require("express");
 const dayjs = require('dayjs');
-const number = require("./number");
+const TOTAL_HOURS_OF_1DAY = 24;
 
 module.exports = {
-    calculatePriceOfCars: (startTime, endTime, car_list, price_list, peak_season_list) => {
+    calculatePriceOfCars: (startTime, endTime, car_list_and_price_list, peak_season_list) => {
         const start_date = dayjs(startTime);
         const end_date = dayjs(endTime);
         const day  = end_date.diff(start_date, 'day');
-        let hour = end_date.diff(start_date, 'hour') % number.TOTAL_HOURS_OF_1DAY;
+        let hour = end_date.diff(start_date, 'hour') % TOTAL_HOURS_OF_1DAY;
 
         if (start_date.minute() != end_date.minute()) hour++;
+
+        let [car_list, price_list] = seperate_car_list_and_price_list(car_list_and_price_list);
 
         const length = car_list.length;
 
@@ -47,6 +49,69 @@ module.exports = {
         return car_list;
     },
  };
+
+ function seperate_car_list_and_price_list(car_list_and_price_list) {
+    let car_list = [];
+    let price_list = [];
+    const length = car_list_and_price_list.length;
+    
+    for (let i = 0; i < length; i++) {
+        let price = new Object();
+        price.p_rs_index = car_list_and_price_list[i].p_rs_index;
+        price.p_1_or_2_days = car_list_and_price_list[i].p_1_or_2_days;
+        price.p_3_or_4_days = car_list_and_price_list[i].p_3_or_4_days;
+        price.p_5_or_6_days = car_list_and_price_list[i].p_5_or_6_days;
+        price.p_7_days = car_list_and_price_list[i].p_7_days;
+        price.p_1_hour = car_list_and_price_list[i].p_1_hour;
+        price.p_6_hours = car_list_and_price_list[i].p_6_hours;
+        price.p_12_hours = car_list_and_price_list[i].p_12_hours;
+        price.p_type = car_list_and_price_list[i].p_type;
+
+        price_list.push(price);
+
+        let isSameCarInList = findIfSameCarIsInList(car_list, car_list_and_price_list, i);
+
+        if (isSameCarInList) continue;
+
+        let data = new Object();
+        data.c_index = car_list_and_price_list[i].c_index;
+        data.c_type = car_list_and_price_list[i].c_type;
+        data.c_name = car_list_and_price_list[i].c_name;
+        data.c_max_number_of_people = car_list_and_price_list[i].c_max_number_of_people;
+        data.c_gear = car_list_and_price_list[i].c_gear;
+        data.c_number_of_load = car_list_and_price_list[i].c_number_of_load;
+        data.c_number_of_door = car_list_and_price_list[i].c_number_of_door;
+        data.c_air_conditioner_or_not = car_list_and_price_list[i].c_air_conditioner_or_not;
+        data.c_production_year = car_list_and_price_list[i].c_production_year;
+        data.c_fuel = car_list_and_price_list[i].c_fuel;
+        data.c_description = car_list_and_price_list[i].c_description;
+        data.c_driver_age = car_list_and_price_list[i].c_driver_age;
+        data.a_index = car_list_and_price_list[i].a_index;
+        data.a_name = car_list_and_price_list[i].a_name;
+        data.a_info = car_list_and_price_list[i].a_info;
+        data.a_number_of_reservation = car_list_and_price_list[i].a_number_of_reservation;
+        data.a_grade = car_list_and_price_list[i].a_grade;
+        data.a_new_or_not = car_list_and_price_list[i].a_new_or_not;
+        data.rs_index = car_list_and_price_list[i].rs_index;
+
+        car_list.push(data);
+    }
+
+    return [car_list, price_list];
+ }
+
+ function findIfSameCarIsInList(car_list, car_list_and_price_list, i) {
+    let isSameCarInList = false;
+
+    for (let k = 0; k < car_list.length; k++) {
+        if (car_list[k].rs_index == car_list_and_price_list[i].rs_index) {
+            isSameCarInList = true;
+            break;
+        }
+    }
+
+    return isSameCarInList;
+ }
 
  function find_price_list_of_car(car_list, price_list, i) {
     let price_list_of_car = [];

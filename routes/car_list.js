@@ -3,8 +3,9 @@ const router = express.Router();
 const car_repository = require("../db/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
+const time = require("../application/check_time");
 const error = require("../core/error");
-const calculate = require("../core/calculate_price");
+const calculate = require("../application/calculate_price");
 
 /**
  * @swagger
@@ -57,10 +58,7 @@ const calculate = require("../core/calculate_price");
  *              a_info: '송내역 2번 출구 도보 5분 이내'
  *              a_number_of_reservation: 2200
  *              a_grade: 4.9
- *              a_l_index: 13
  *              a_new_or_not: 'n'
- *              a_open_time: 08:00:00
- *              a_close_time: 22:00:00
  *              rs_index: 1
  *              car_price: 55000
  *          404: 
@@ -104,10 +102,7 @@ const calculate = require("../core/calculate_price");
  *       - a_info
  *       - a_number_of_reservation
  *       - a_grade
- *       - a_l_index
  *       - a_new_or_not
- *       - a_open_time
- *       - a_close_time
  *       - rs_index
  *       - car_price
  *     properties:
@@ -164,21 +159,10 @@ const calculate = require("../core/calculate_price");
  *         type: number
  *         format: float
  *         description: 업체 평점
- *       a_l_index:
- *         type: integer
- *         description: 지역 고유번호
  *       a_new_or_not:
  *         type: string
  *         enum: [y, n]
  *         description: 신규등록업체 유무
- *       a_open_time:
- *         type: string
- *         format: time
- *         description: 업체 오픈 시간
- *       a_close_time:
- *         type: string
- *         format: time
- *         description: 업체 마감 시간
  *       rs_index:
  *         type: integer
  *         description: 렌트가능차량 고유번호
@@ -188,8 +172,7 @@ const calculate = require("../core/calculate_price");
  */
 router.get("/", function(req, res){
     const location = decodeURIComponent(req.query.location);
-    const startTime = req.query.startTime;
-    const endTime = req.query.endTime;
+    const { startTime, endTime } = req.query;
     
     if (validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
         response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
@@ -201,62 +184,41 @@ router.get("/", function(req, res){
         return;
     }
     
-    switch (validate.checkTime(startTime, endTime)) {
-        case error.OVER_TIME_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.OVER_TIME_ERROR_MESSAGE);
-            return;
-        case error.PAST_TIME_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.PAST_TIME_ERROR_MESSAGE);
-            return;
-        case error.TIME_DIFFERENCE_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.TIME_DIFFERENCE_ERROR_MESSAGE);
-            return;
-        case error.DATE_DIFFERENCE_ERROR:
-            response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.DATE_DIFFERENCE_ERROR_MESSAGE);
-            return;
-        default:
-            break;    
-    }
-    
     if (!validate.validateRequestDatetime(startTime, endTime)) {
         response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
         return;
     }
+    
+    if(!time.checkTimeError(startTime, endTime, res)) return;
 
-    const getCarList = new Promise(function(resolve, reject) {
-        car_repository.findCars(location, startTime, endTime, function(err, result){
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
-
-    const getPriceList = new Promise(function(resolve, reject) {
-        car_repository.findPriceListOfCars(location, startTime, endTime, function(err, result){
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
-
-    const getPeakSeasonList = new Promise(function(resolve, reject) {
-        car_repository.findPeakSeasonList(function(err, result){
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
-
-    Promise.all([getCarList, getPriceList, getPeakSeasonList])
+    Promise.all(getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime))
     .then((values) => {
-        if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null && values[2] != undefined && values[2] != null) {
-            car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1], values[2]);
+        if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
+            car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1]);
             res.send(car_list);
         }
         else {
             res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
         }
-    })
-    .catch((error) => {
-        res.status(404).send({code: "SQL ERROR", errorMessage: error});
     });
 });
 
 module.exports = router;
+
+function getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime) {
+    const carListAndPriceList = new Promise(function(resolve, reject) {
+        car_repository.findCarsAndPrices(location, startTime, endTime, function(err, result){
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    const peakSeasonList = new Promise(function(resolve, reject) {
+        car_repository.findPeakSeasons(location, startTime, endTime, function(err, result){
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    return [carListAndPriceList, peakSeasonList];
+}

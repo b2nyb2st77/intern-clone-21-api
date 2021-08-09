@@ -1,6 +1,4 @@
 const express = require("express");
-const time = require("./check_time");
-const error = require("./error");
 
 module.exports = {
     validateRequestInteger: (index) => {
@@ -9,13 +7,6 @@ module.exports = {
     validateRequestDatetime: (startTime, endTime) => {
         const regexp = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
         return regexp.test(startTime) && regexp.test(endTime);
-    },
-    checkTime: (startTime, endTime) => {
-        if (startTime >= endTime) return error.OVER_TIME_ERROR;
-        else if (!time.checkIfTimeIsLaterThanNow(startTime, endTime)) return error.PAST_TIME_ERROR;
-        else if (!time.checkIfTimeDiffIsLessThanMinimumHoursOfRent(startTime, endTime)) return error.TIME_DIFFERENCE_ERROR;
-        else if (!time.checkIfDateDiffIsMoreThanMaximumDaysOfRent(startTime, endTime)) return error.DATE_DIFFERENCE_ERROR;
-        else return error.OK;
     },
     isEmpty: (str) => {
         return (typeof str === "undefined" || str === null || str === "") ? true : false;
