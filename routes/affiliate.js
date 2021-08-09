@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const affiliate_repository = require("../db/affiliate");
+const application = require("../application/affiliate");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error = require("../core/error");
@@ -120,10 +120,7 @@ router.get("/:index", function(req, res){
         return;
     }
 
-    affiliate_repository.findOneAffiliate(index, function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else res.send(result);
-    });
+    application.findOneAffiliate(index, res);
 });
 
 module.exports = router;

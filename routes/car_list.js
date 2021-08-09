@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const car_repository = require("../db/car");
+const application = require("../application/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const time = require("../application/check_time");
 const error = require("../core/error");
-const calculate = require("../application/calculate_price");
 
 /**
  * @swagger
@@ -191,34 +190,7 @@ router.get("/", function(req, res){
     
     if(!time.checkTimeError(startTime, endTime, res)) return;
 
-    Promise.all(getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime))
-    .then((values) => {
-        if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
-            car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1]);
-            res.send(car_list);
-        }
-        else {
-            res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
-        }
-    });
+    application.findCarList(location, startTime, endTime, res);
 });
 
 module.exports = router;
-
-function getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime) {
-    const carListAndPriceList = new Promise(function(resolve, reject) {
-        car_repository.findCarsAndPrices(location, startTime, endTime, function(err, result){
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
-
-    const peakSeasonList = new Promise(function(resolve, reject) {
-        car_repository.findPeakSeasons(location, startTime, endTime, function(err, result){
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
-
-    return [carListAndPriceList, peakSeasonList];
-}

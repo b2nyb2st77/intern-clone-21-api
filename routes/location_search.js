@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const location_repository = require("../db/location");
+const application = require("../application/location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error = require("../core/error");
@@ -119,10 +119,7 @@ router.get("/", function(req, res){
         return;
     }
 
-    location_repository.searchLocation(searchWord, function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else res.send(result);
-    });
+    application.searchLocation(searchWord, res);
 });
 
 module.exports = router;

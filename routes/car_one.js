@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const car_repository = require("../db/car");
+const application = require("../application/car");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error = require("../core/error");
@@ -132,10 +132,7 @@ router.get("/:index", function(req, res){
         return;
     }
     
-    car_repository.findOneCar(index, function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else res.send(result);
-    });
+    application.findOneCar(index, res);
 });
 
 module.exports = router;

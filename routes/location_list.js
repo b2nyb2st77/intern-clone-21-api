@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const location_repository = require("../db/location");
+const application = require("../application/location");
 
 /**
  * @swagger
@@ -45,10 +45,7 @@ const location_repository = require("../db/location");
  *              errorMessage: 'PARAMETER IS EMPTY'
  */
 router.get("/", function(req, res){ 
-    location_repository.findLocations(function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else res.send(result);
-    });
+    application.findLocations(res);
 });
 
 module.exports = router;

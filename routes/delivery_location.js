@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const dl_repository = require("../db/delivery_location");
+const application = require("../application/delivery_location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error = require("../core/error");
@@ -75,10 +75,7 @@ router.get("/", function(req, res){
         return;
     }
     
-    dl_repository.findDeliveryLocation(affiliateName, function(err, result){
-        if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-        else res.send(result);
-    });
+    application.findDeliveryLocation(affiliateName, res);
 });
 
 module.exports = router;
