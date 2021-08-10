@@ -1,5 +1,5 @@
 const express = require("express");
-const dayjs = require('dayjs');
+const dayjs = require("dayjs");
 
 const TOTAL_HOURS_OF_1DAY = 24;
 
@@ -32,17 +32,17 @@ module.exports = {
 
             if (hour > 0) {
                 switch (type_of_last_day) {
-                    case 'weekend':
+                    case "weekend":
                         total_price_of_car += calculate_hour_price(hour, weekend_price[0]);
                         break;
-                    case 'weekdays':
+                    case "weekdays":
                         total_price_of_car += calculate_hour_price(hour, weekdays_price[0]);
                         break;
-                    case 'peakseason':
+                    case "peakseason":
                         total_price_of_car += calculate_hour_price(hour, peak_season_price[0]);
                         break;
                     default:
-                        break;
+                        return new Error("TYPE OF LAST DAY ERROR");
                 }
             }
 
@@ -140,17 +140,17 @@ module.exports = {
 
     for (let k = 0; k < length; k++) {
         switch (price_list_of_car[k].p_type) {
-            case 'weekend':
+            case "weekend":
                 weekend_price.push(price_list_of_car[k]);
                 break;
-            case 'weekdays':
+            case "weekdays":
                 weekdays_price.push(price_list_of_car[k]);
                 break;
-            case 'peakseason':
+            case "peakseason":
                 peak_season_price.push(price_list_of_car[k]);
                 break;
             default:
-                break;
+                return new Error("PRICE TYPE ERROR");
         }
     }
 
@@ -174,7 +174,7 @@ module.exports = {
     let number_of_peak_season_days = 0;
     let number_of_weekdays = 0;
     let number_of_weekend = 0;
-    let type_of_last_day = '';
+    let type_of_last_day = "";
     
     const weekdays = [1, 2, 3, 4, 5];
     const length = peak_season_of_affiliate.length;
@@ -193,7 +193,7 @@ module.exports = {
                 if (isDateBetweenStartDateAndEndDate(k, ps_start_date, ps_end_date)) {
                     isDayPeakSeason = true;
 
-                    if (isDateSame(k, end_date)) type_of_last_day = 'peakseason';
+                    if (isDateSame(k, end_date)) type_of_last_day = "peakseason";
                     else number_of_peak_season_days++;
                 }
             }
@@ -206,7 +206,7 @@ module.exports = {
         const day = k.day();
 
         if (isDateSame(k, end_date)) {
-            type_of_last_day = (!~weekdays.indexOf(day)) ? 'weekend' : 'weekdays';
+            type_of_last_day = (!~weekdays.indexOf(day)) ? "weekend" : "weekdays";
         }
         else {
             (!~weekdays.indexOf(day)) ? number_of_weekend++ : number_of_weekdays++;

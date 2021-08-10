@@ -1,5 +1,5 @@
 const express = require("express");
-const dayjs = require('dayjs');
+const dayjs = require("dayjs");
 
 const number = require("../core/constant");
 const error = require("../core/error");

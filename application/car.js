@@ -8,8 +8,12 @@ module.exports = {
         Promise.all(getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime))
         .then((values) => {
             if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
-                car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1]);
-                res.send(car_list);
+                try {
+                    car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1]);
+                    res.send(car_list);
+                } catch (error) {
+                    res.status(404).send({code: "CARCULATE PRICE ERROR", errorMessage: error});
+                }
             }
             else {
                 res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
