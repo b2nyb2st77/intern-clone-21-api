@@ -1,10 +1,11 @@
 const express = require("express");
-const router = express.Router();
 
-const application = require("../application/location");
 const response_handler = require("../core/responseHandler");
 const validate = require("../core/validate");
 const error = require("../core/error");
+const application = require("../application/location");
+
+const router = express.Router();
 
 /**
  * @swagger

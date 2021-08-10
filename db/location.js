@@ -1,6 +1,7 @@
 const express = require("express");
 
 const mysql = require("../db/mysql");
+
 const connection = mysql.init();
 
 module.exports = {
