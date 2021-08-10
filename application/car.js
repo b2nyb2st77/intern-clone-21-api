@@ -1,4 +1,5 @@
 const express = require("express");
+
 const car_repository = require("../db/car");
 const calculate = require("./calculate_price");
 
@@ -17,14 +18,22 @@ module.exports = {
     },
     findOneCar: (index, res) => {
         car_repository.findOneCar(index, function(err, result){
-            if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-            else res.send(result);
+            if (err) {
+                res.status(404).send({code: "SQL ERROR", errorMessage: err});
+            }
+            else {
+                res.send(result);
+            }
         });
     },
     findReservedCar: (carName, location, startTime, endTime, res) => {
         car_repository.findReservedCar(carName, location, startTime, endTime, function(err, result){
-                if (err) res.status(404).send({code: "SQL ERROR", errorMessage: err});
-                else res.send({number_of_affiliate: result[0][0].count, number_of_car: result[1][0].count});
+                if (err) {
+                    res.status(404).send({code: "SQL ERROR", errorMessage: err});
+                }
+                else {
+                    res.send({number_of_affiliate: result[0][0].count, number_of_car: result[1][0].count});
+                }
             }
         );
     }
@@ -33,15 +42,23 @@ module.exports = {
 function getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime) {
     const carListAndPriceList = new Promise(function(resolve, reject) {
         car_repository.findCarsAndPrices(location, startTime, endTime, function(err, result){
-            if (err) reject(err);
-            else resolve(result);
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
         });
     });
 
     const peakSeasonList = new Promise(function(resolve, reject) {
         car_repository.findPeakSeasons(location, startTime, endTime, function(err, result){
-            if (err) reject(err);
-            else resolve(result);
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
         });
     });
 

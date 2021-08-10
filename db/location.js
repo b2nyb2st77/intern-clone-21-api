@@ -1,4 +1,5 @@
 const express = require("express");
+
 const mysql = require("../db/mysql");
 const connection = mysql.init();
 
@@ -9,8 +10,12 @@ module.exports = {
         FROM location`;
 
         return connection.query(sql, function(err, result){
-            if(err) throw err;
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
     searchLocation: (searchWord, callback) => {
@@ -20,8 +25,12 @@ module.exports = {
         WHERE l_name LIKE '%${searchWord}%'`;         
 
         return connection.query(sql, function(err, result){
-            if(err) throw err;
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
 };

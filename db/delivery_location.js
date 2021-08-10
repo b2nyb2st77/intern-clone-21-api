@@ -1,4 +1,5 @@
 const express = require("express");
+
 const mysql = require("./mysql");
 const connection = mysql.init();
 
@@ -12,8 +13,12 @@ module.exports = {
         WHERE a.a_name = '${affiliateName}'`;
         
         return connection.query(sql, function(err, result){
-            if(err) throw err;
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
 };

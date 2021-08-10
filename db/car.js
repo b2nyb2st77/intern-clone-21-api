@@ -1,4 +1,5 @@
 const express = require("express");
+
 const mysql = require("../db/mysql");
 const connection = mysql.init();
 
@@ -31,8 +32,12 @@ module.exports = {
                ORDER BY FIELD(c.c_type, '경형', '소형', '준중형', '중형', '대형', '수입', 'RV', 'SUV'), c.c_name, a.a_name ASC`;
 
         return connection.query(sql, function(err, result){
-            if(err) callback(err);
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
     findReservedCar: (carName, location, startTime, endTime, callback) => {
@@ -79,8 +84,12 @@ module.exports = {
                     OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${endTime}'));`;
 
         return connection.query(sql1 + sql2, function(err, result){
-            if(err) callback(err);
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
     findOneCar: (index, callback) => {
@@ -90,8 +99,12 @@ module.exports = {
         WHERE c_index = ?`;
 
         return connection.query(sql, index, function(err, result){
-            if(err) callback(err);
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
     findPeakSeasons: (location, startTime, endTime, callback) => {
@@ -109,8 +122,12 @@ module.exports = {
                     OR (ps.ps_start_date <= '${startTime}' AND ps.ps_end_date >= '${endTime}'));`;
 
         return connection.query(sql, function(err, result){
-            if(err) callback(err);
-            else callback(null, result);
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
         });
     },
  };

@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql");
 require('dotenv').config();
+
 const { host, user, password, database } = process.env;
 
 module.exports = {
@@ -14,7 +15,9 @@ module.exports = {
         });
 
         con.connect(function(err){
-            if(err) throw err;
+            if (err) {
+                throw err;
+            }
         });
 
         return con;

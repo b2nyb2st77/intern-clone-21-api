@@ -19,7 +19,13 @@
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.1.6"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/b2nyb2st77/intern-clone-21-api.git"

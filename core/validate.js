@@ -12,12 +12,18 @@ module.exports = {
         return (typeof str === "undefined" || str === null || str === "") ? true : false;
     },
     checkInjection: (obj) => {
-        if (obj.length > 0) {
-            const expText = /[%=><]/;
-            if (expText.test(obj)) return false; 
+        if (obj.length <= 0) {
+            return false;
+        }
+        
+        const expText = /[%=><]/;
+        if (expText.test(obj)) {
+            return false;
+        }
 
-            const sqlRegExp = /(OR)+|(SELECT)+|(INSERT)+|(DELETE)+|(UPDATE)+|(CREATE)+|(DROP)+|(EXEC)+|(UNION)+|(FETCH)+|(DECLARE)+|(TRUNCATE)+/;
-            if (sqlRegExp.test(obj)) return false;
+        const sqlRegExp = /(OR)+|(SELECT)+|(INSERT)+|(DELETE)+|(UPDATE)+|(CREATE)+|(DROP)+|(EXEC)+|(UNION)+|(FETCH)+|(DECLARE)+|(TRUNCATE)+/;
+        if (sqlRegExp.test(obj)) {
+            return false;
         }
 
         return true;

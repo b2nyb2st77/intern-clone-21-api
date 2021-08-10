@@ -1,5 +1,6 @@
 const express = require("express");
 const dayjs = require('dayjs');
+
 const number = require("../core/constant");
 const error = require("../core/error");
 const response_handler = require("../core/responseHandler");
@@ -26,11 +27,21 @@ module.exports = {
 };
 
 function checkTime(startTime, endTime) {
-    if (startTime >= endTime) return error.OVER_TIME_ERROR;
-    else if (!checkIfTimeIsLaterThanNow(startTime, endTime)) return error.PAST_TIME_ERROR;
-    else if (!checkIfTimeDiffIsLessThanMinimumHoursOfRent(startTime, endTime)) return error.TIME_DIFFERENCE_ERROR;
-    else if (!checkIfDateDiffIsMoreThanMaximumDaysOfRent(startTime, endTime)) return error.DATE_DIFFERENCE_ERROR;
-    else return error.OK;
+    if (startTime >= endTime) {
+        return error.OVER_TIME_ERROR;
+    }
+    else if (!checkIfTimeIsLaterThanNow(startTime, endTime)) {
+        return error.PAST_TIME_ERROR;
+    }
+    else if (!checkIfTimeDiffIsLessThanMinimumHoursOfRent(startTime, endTime)) {
+        return error.TIME_DIFFERENCE_ERROR;
+    }
+    else if (!checkIfDateDiffIsMoreThanMaximumDaysOfRent(startTime, endTime)) {
+        return error.DATE_DIFFERENCE_ERROR;
+    }
+    else {
+        return error.OK;
+    }
 }
 
 function checkIfTimeDiffIsLessThanMinimumHoursOfRent(startTime, endTime) {
@@ -54,4 +65,3 @@ function checkIfTimeIsLaterThanNow(startTime, endTime) {
 
     return (start > now && end > now);
 }
-
