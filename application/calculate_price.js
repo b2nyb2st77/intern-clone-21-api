@@ -24,26 +24,36 @@ module.exports = {
             let price_list_of_car = find_price_list_of_car(car_list[i], price_list);
             let [weekend_price, weekdays_price, peak_season_price] = classify_price_list_by_price_type(price_list_of_car);
             let peak_season_of_affiliate = find_peak_seasons_of_affiliate(car_list[i], peak_season_list);
+            let weekend_of_affiliate = car_list[i].a_weekend;
 
             let [number_of_peak_season_days, number_of_weekdays, number_of_weekend, type_of_last_day] = 
-            calculateNumberOfEachTypeOfDaysAndFindTypeOfLastDay(start_date, end_date, peak_season_of_affiliate);
+            calculateNumberOfEachTypeOfDaysAndFindTypeOfLastDay(start_date, end_date, peak_season_of_affiliate, weekend_of_affiliate);
 
-            total_price_of_car += calculate_day_price(day, number_of_weekend, number_of_weekdays, number_of_peak_season_days, weekend_price, weekdays_price, peak_season_price);
+            let total_day_price_of_car = calculate_day_price(day, number_of_weekend, number_of_weekdays, number_of_peak_season_days, weekend_price, weekdays_price, peak_season_price);
 
-            if (hour > 0) {
-                switch (type_of_last_day) {
-                    case "weekend":
-                        total_price_of_car += calculate_hour_price(hour, weekend_price[0]);
-                        break;
-                    case "weekdays":
-                        total_price_of_car += calculate_hour_price(hour, weekdays_price[0]);
-                        break;
-                    case "peakseason":
-                        total_price_of_car += calculate_hour_price(hour, peak_season_price[0]);
-                        break;
-                    default:
-                        return new Error("TYPE OF LAST DAY ERROR");
-                }
+            if (!~total_day_price_of_car) {
+                return new Error("NEGATIVE DAY ERROR");
+            }
+
+            total_price_of_car += total_day_price_of_car;
+
+            if (hour === 0) {
+                car_list[i].car_price = total_price_of_car;
+                continue;
+            }
+
+            switch (type_of_last_day) {
+                case "weekend":
+                    total_price_of_car += calculate_hour_price(hour, weekend_price[0]);
+                    break;
+                case "weekdays":
+                    total_price_of_car += calculate_hour_price(hour, weekdays_price[0]);
+                    break;
+                case "peakseason":
+                    total_price_of_car += calculate_hour_price(hour, peak_season_price[0]);
+                    break;
+                default:
+                    return new Error("TYPE OF LAST DAY ERROR");
             }
 
             car_list[i].car_price = total_price_of_car;
@@ -97,6 +107,7 @@ module.exports = {
         data.a_number_of_reservation = car_list_and_price_list[i].a_number_of_reservation;
         data.a_grade = car_list_and_price_list[i].a_grade;
         data.a_new_or_not = car_list_and_price_list[i].a_new_or_not;
+        data.a_weekend = car_list_and_price_list[i].a_weekend;
         data.rs_index = car_list_and_price_list[i].rs_index;
 
         car_list.push(data);
@@ -170,13 +181,13 @@ module.exports = {
     return peak_season_of_affiliate;
  }
 
- function calculateNumberOfEachTypeOfDaysAndFindTypeOfLastDay(start_date, end_date, peak_season_of_affiliate) {
+ function calculateNumberOfEachTypeOfDaysAndFindTypeOfLastDay(start_date, end_date, peak_season_of_affiliate, weekend_of_affiliate) {
     let number_of_peak_season_days = 0;
     let number_of_weekdays = 0;
     let number_of_weekend = 0;
     let type_of_last_day = "";
     
-    const weekdays = [1, 2, 3, 4, 5];
+    const weekends = weekend_of_affiliate.split(", ");
     const length = peak_season_of_affiliate.length;
 
     for (let k = start_date; k <= end_date; k = k.add(1, 'day')) {
@@ -203,13 +214,13 @@ module.exports = {
             }
         }
         
-        const day = k.day();
+        const day = k.day().toString();
 
         if (isDateSame(k, end_date)) {
-            type_of_last_day = (!~weekdays.indexOf(day)) ? "weekend" : "weekdays";
+            type_of_last_day = (!~weekends.indexOf(day)) ? "weekdays" : "weekend";
         }
         else {
-            (!~weekdays.indexOf(day)) ? number_of_weekend++ : number_of_weekdays++;
+            (!~weekends.indexOf(day)) ? number_of_weekdays++ : number_of_weekend++;
         }
     }
 
@@ -246,6 +257,9 @@ module.exports = {
         total_price_of_car += number_of_weekend * weekend_price[0].p_1_or_2_days;
         total_price_of_car += number_of_weekdays * weekdays_price[0].p_1_or_2_days;
         total_price_of_car += number_of_peak_season_days * peak_season_price[0].p_1_or_2_days;
+    }
+    else {
+        return -1;
     }
 
     return total_price_of_car;

@@ -38,6 +38,7 @@ const router = express.Router();
  *              a_new_or_not: 'n'
  *              a_open_time: 08:00:00
  *              a_close_time: 22:00:00
+ *              a_weekend: 0, 6
  *          404: 
  *            description: 업체 정보 불러오기 실패
  *            schema:
@@ -71,6 +72,7 @@ const router = express.Router();
  *       - a_new_or_not
  *       - a_open_time
  *       - a_close_time
+ *       - a_weekend
  *     properties:
  *       a_index:
  *         type: integer
@@ -103,6 +105,9 @@ const router = express.Router();
  *         type: string
  *         format: time
  *         description: 업체 마감 시간
+ *       a_weekend:
+ *         type: string
+ *         description: 업체 주말
  */
 router.get("/:index", function(req, res){
     const index = req.params.index;
