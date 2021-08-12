@@ -1,25 +1,11 @@
 const express = require("express");
 
 const car_repository = require("../db/car");
-const calculate = require("./calculate_price");
+const affiliate_repository = require("../db/affiliate");
+const calculate_price = require("./calculate_price");
+const check_open_hour = require("./check_open_hour");
 
 module.exports = {
-    findCarList: (location, startTime, endTime, res) => {
-        Promise.all(getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime))
-        .then((values) => {
-            if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
-                try {
-                    car_list = calculate.calculatePriceOfCars(startTime, endTime, values[0], values[1]);
-                    res.send(car_list);
-                } catch (error) {
-                    res.status(404).send({code: "CARCULATE PRICE ERROR", errorMessage: error});
-                }
-            }
-            else {
-                res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
-            }
-        });
-    },
     findOneCar: (index, res) => {
         car_repository.findOneCar(index, function(err, result){
             if (err) {
@@ -40,23 +26,56 @@ module.exports = {
                 }
             }
         );
-    }
+    },
+    findCarList: (location, startTime, endTime, res) => {
+        affiliate_repository.findAffiliatesByLocation(location, function(err, affiliates){
+            if (err) {
+                res.status(404).send({code: "SQL ERROR", errorMessage: err});
+            }
+            else {
+                affiliate_repository.findTemporaryOpenHourOfAffiliates(affiliates, function(err, affiliate_temporary_open_hour_list){
+                    if (err) {
+                        res.status(404).send({code: "SQL ERROR", errorMessage: err});
+                    }
+                    else {
+                        const available_affiliates = check_open_hour.findAvailableAffiliate(startTime, endTime, affiliates, affiliate_temporary_open_hour_list);
+                        
+                        Promise.all(getCarListAndPriceListAndPeakSeasonList(available_affiliates, startTime, endTime))
+                        .then((values) => {
+                            if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
+                                try {
+                                    car_list = calculate_price.calculatePriceOfCars(startTime, endTime, values[0], values[1]);
+                                    res.send(car_list);
+                                } catch (error) {
+                                    res.status(404).send({code: "CARCULATE PRICE ERROR", errorMessage: error});
+                                }
+                            }
+                            else {
+                                res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
+                            }
+                        });
+                        
+                    }
+                });       
+            }
+        });
+    },
 };
 
-function getCarListAndPriceListAndPeakSeasonList(location, startTime, endTime) {
+function getCarListAndPriceListAndPeakSeasonList(available_affiliates, startTime, endTime) {
     const carListAndPriceList = new Promise(function(resolve, reject) {
-        car_repository.findCarsAndPrices(location, startTime, endTime, function(err, result){
+        car_repository.findCarsAndPrices(available_affiliates, startTime, endTime, function(err, result){
             if (err) {
-                reject(err);
+                reject(err);  
             }
             else {
                 resolve(result);
             }
         });
     });
-
+    
     const peakSeasonList = new Promise(function(resolve, reject) {
-        car_repository.findPeakSeasons(location, startTime, endTime, function(err, result){
+        affiliate_repository.findPeakSeasonOfAffiliates(available_affiliates, startTime, endTime, function(err, result){
             if (err) {
                 reject(err);
             }

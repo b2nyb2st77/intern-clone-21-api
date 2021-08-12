@@ -20,4 +20,58 @@ module.exports = {
             }
         });
     },
+    findAffiliatesByLocation: (location, callback) => {
+        const sql = `
+        SELECT a.a_index, a_open_time, a_close_time
+        FROM affiliate a
+        INNER JOIN location l
+        ON a.a_l_index = l.l_index
+        WHERE l.l_name = '${location}' OR l.l_subname = '${location}'`;
+        
+        return connection.query(sql, function(err, result){
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
+        });
+    },
+    findTemporaryOpenHourOfAffiliates: (affiliates, callback) => {
+        const sql = `
+        SELECT atoh_a_index, atoh_start_date, atoh_end_date, atoh_open_time, atoh_close_time
+        FROM affiliate_temporary_open_hour
+        WHERE atoh_a_index IN (${affiliates.map(item => item.a_index).join(",")})
+              AND atoh_delete_or_not = 'n'`;
+
+        return connection.query(sql, function(err, result){
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
+        });
+    },
+    findPeakSeasonOfAffiliates: (affiliates, startTime, endTime, callback) => {
+        const sql = `
+        SELECT ps.ps_a_index, ps.ps_start_date, ps.ps_end_date
+        FROM peak_season ps
+        INNER JOIN affiliate a
+        ON ps.ps_a_index = a.a_index
+        WHERE ps_delete_or_not = 'n'
+              AND a.a_index IN (${affiliates.join(",")})
+              AND ((ps.ps_start_date >= '${startTime}' AND ps.ps_start_date <= '${endTime}') 
+                    OR (ps.ps_end_date >= '${startTime}' AND ps.ps_end_date <= '${endTime}')
+                    OR (ps.ps_start_date <= '${startTime}' AND ps.ps_end_date >= '${endTime}'));`;
+
+        return connection.query(sql, function(err, result){
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
+        });
+    }
 };
