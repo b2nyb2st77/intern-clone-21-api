@@ -47,8 +47,6 @@ module.exports = {
                         res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
                     }
                 });
-
-                
             }
         });
     },

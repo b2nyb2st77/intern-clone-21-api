@@ -55,35 +55,27 @@ module.exports = {
  }
 
  function checkIfAvailiableOnStartTimeAndEndTime(temporaray_open_hour_of_affiliate, start_date, start_time, end_date, end_time, affiliate_open_time, affiliate_close_time) { 
-    let isStartTimeOk = false;
-    let isEndTimeOk = false;
+    let isAvailiableOnStartTime = false;
+    let isAvailiableOnEndTime = false;
     
     const temporary_start_date = dayjs(temporaray_open_hour_of_affiliate.atoh_start_date).format("YYYY-MM-DD");
     const temporary_end_date = dayjs(temporaray_open_hour_of_affiliate.atoh_end_date).format("YYYY-MM-DD");
     const temporary_open_time = temporaray_open_hour_of_affiliate.atoh_open_time;
     const temporary_close_time = temporaray_open_hour_of_affiliate.atoh_close_time;
 
-    if (isDateOrTimeBetweenStartDateAndEndDate(start_date, temporary_start_date, temporary_end_date)) {
-        if (isDateOrTimeBetweenStartDateAndEndDate(start_time, temporary_open_time, temporary_close_time)) {
-            isStartTimeOk = true;
-        }
+    if (isDateOrTimeBetweenStartDateAndEndDate(start_date, temporary_start_date, temporary_end_date) && isDateOrTimeBetweenStartDateAndEndDate(start_time, temporary_open_time, temporary_close_time)) {
+        isAvailiableOnStartTime = true;
     }
-    else {
-        if (isDateOrTimeBetweenStartDateAndEndDate(start_time, affiliate_open_time, affiliate_close_time)) {
-            isStartTimeOk = true;
-        }
+    else if (isDateOrTimeBetweenStartDateAndEndDate(start_time, affiliate_open_time, affiliate_close_time)) {
+        isAvailiableOnStartTime = true;
     }
 
-    if (isDateOrTimeBetweenStartDateAndEndDate(end_date, temporary_start_date, temporary_end_date)) {
-        if (isDateOrTimeBetweenStartDateAndEndDate(end_time, temporary_open_time, temporary_close_time)) {
-            isEndTimeOk = true;
-        }
+    if (isDateOrTimeBetweenStartDateAndEndDate(end_date, temporary_start_date, temporary_end_date) && isDateOrTimeBetweenStartDateAndEndDate(end_time, temporary_open_time, temporary_close_time)) {
+        isAvailiableOnEndTime = true;
     }
-    else {
-        if (isDateOrTimeBetweenStartDateAndEndDate(end_time, affiliate_open_time, affiliate_close_time)) {
-            isEndTimeOk = true;
-        }
+    else if (isDateOrTimeBetweenStartDateAndEndDate(end_time, affiliate_open_time, affiliate_close_time)) {
+        isAvailiableOnEndTime = true;
     }
 
-    return [isStartTimeOk, isEndTimeOk];
+    return [isAvailiableOnStartTime, isAvailiableOnEndTime];
  }
