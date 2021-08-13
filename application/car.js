@@ -22,7 +22,7 @@ module.exports = {
                     res.status(404).send({code: "SQL ERROR", errorMessage: err});
                 }
                 else {
-                    res.send({number_of_affiliate: result[0][0].count, number_of_car: result[1][0].count});
+                    res.send(result);
                 }
             }
         );

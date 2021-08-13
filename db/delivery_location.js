@@ -18,7 +18,17 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let delivery_location_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    delivery_location_list.push({
+                        dl_sido : result[i].dl_sido,
+                        dl_gu : result[i].dl_gu
+                    });
+                }
+
+                callback(null, delivery_location_list);
             }
         });
     },

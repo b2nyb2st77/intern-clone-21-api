@@ -15,7 +15,21 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let location_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    location_list.push({
+                        l_index : result[i].l_index,
+                        l_name : result[i].l_name,
+                        l_type : result[i].l_type,
+                        l_popular_or_not : result[i].l_popular_or_not,
+                        l_immediate_or_not : result[i].l_immediate_or_not,
+                        l_subname : result[i].l_subname
+                    });
+                }
+
+                callback(null, location_list);
             }
         });
     },
@@ -30,7 +44,18 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let location_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    location_list.push({
+                        l_index : result[i].l_index,
+                        l_name : result[i].l_name,
+                        l_immediate_or_not : result[i].l_immediate_or_not
+                    });
+                }
+
+                callback(null, location_list);
             }
         });
     },

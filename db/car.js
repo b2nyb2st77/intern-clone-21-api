@@ -34,7 +34,73 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let car_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    let isSameCarInList = false;
+                    const length = car_list.length;
+
+                    for (let k = 0; k < length; k++) {
+                        if (car_list[k].rs_index === result[i].rs_index) {
+                            isSameCarInList = true;
+
+                            car_list[k].price_list.push({
+                                p_rs_index : result[i].p_rs_index, 
+                                p_1_or_2_days : result[i].p_1_or_2_days, 
+                                p_3_or_4_days : result[i].p_3_or_4_days, 
+                                p_5_or_6_days : result[i].p_5_or_6_days, 
+                                p_7_days : result[i].p_7_days, 
+                                p_1_hour : result[i].p_1_hour, 
+                                p_6_hours : result[i].p_6_hours, 
+                                p_12_hours : result[i].p_12_hours, 
+                                p_type : result[i].p_type
+                            });
+
+                            break;
+                        }
+                    }
+
+                    if (isSameCarInList) {
+                        continue;
+                    }
+
+                    car_list.push({
+                        c_index : result[i].c_index, 
+                        c_type : result[i].c_type, 
+                        c_name : result[i].c_name, 
+                        c_max_number_of_people : result[i].c_max_number_of_people, 
+                        c_gear : result[i].c_gear, 
+                        c_number_of_load : result[i].c_number_of_load, 
+                        c_number_of_door : result[i].c_number_of_door, 
+                        c_air_conditioner_or_not : result[i].c_air_conditioner_or_not, 
+                        c_production_year : result[i].c_production_year, 
+                        c_fuel : result[i].c_fuel,
+                        c_description : result[i].c_description, 
+                        c_driver_age : result[i].c_driver_age, 
+                        a_index : result[i].a_index, 
+                        a_name : result[i].a_name, 
+                        a_info : result[i].a_info, 
+                        a_number_of_reservation : result[i].a_number_of_reservation, 
+                        a_grade : result[i].a_grade, 
+                        a_new_or_not : result[i].a_new_or_not, 
+                        a_weekend : result[i].a_weekend, 
+                        rs_index : result[i].rs_index,
+                        price_list : [{
+                            p_rs_index : result[i].p_rs_index, 
+                            p_1_or_2_days : result[i].p_1_or_2_days, 
+                            p_3_or_4_days : result[i].p_3_or_4_days, 
+                            p_5_or_6_days : result[i].p_5_or_6_days, 
+                            p_7_days : result[i].p_7_days, 
+                            p_1_hour : result[i].p_1_hour, 
+                            p_6_hours : result[i].p_6_hours, 
+                            p_12_hours : result[i].p_12_hours, 
+                            p_type : result[i].p_type
+                        }]
+                    });
+                }
+
+                callback(null, car_list);
             }
         });
     },
@@ -86,7 +152,7 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                callback(null, {number_of_affiliate: result[0][0].count, number_of_car: result[1][0].count});
             }
         });
     },

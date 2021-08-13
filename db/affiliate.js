@@ -1,3 +1,4 @@
+const { application } = require("express");
 const express = require("express");
 
 const mysql = require("../db/mysql");
@@ -33,7 +34,18 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let affiliate_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    affiliate_list.push({
+                        a_index : result[i].a_index,
+                        a_open_time : result[i].a_open_time,
+                        a_close_time : result[i].a_close_time
+                    });
+                }
+
+                callback(null, affiliate_list);
             }
         });
     },
@@ -49,7 +61,20 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let temporary_open_hour_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    temporary_open_hour_list.push({
+                        atoh_a_index : result[i].atoh_a_index,
+                        atoh_start_date : result[i].atoh_start_date,
+                        atoh_end_date : result[i].atoh_end_date,
+                        atoh_open_time : result[i].atoh_open_time,
+                        atoh_close_time : result[i].atoh_close_time
+                    });
+                }
+                
+                callback(null, temporary_open_hour_list);
             }
         });
     },
@@ -70,7 +95,18 @@ module.exports = {
                 callback(err);
             }
             else {
-                callback(null, result);
+                let peak_season_list = [];
+                const length = result.length;
+                
+                for (let i = 0; i < length; i++) {
+                    peak_season_list.push({
+                        ps_a_index : result[i].ps_a_index,
+                        ps_start_date : result[i].ps_start_date,
+                        ps_end_date : result[i].ps_end_date
+                    });
+                }
+
+                callback(null, peak_season_list);
             }
         });
     }
