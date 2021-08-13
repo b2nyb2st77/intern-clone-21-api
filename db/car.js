@@ -18,7 +18,7 @@ module.exports = {
         ON rs.rs_c_index = c.c_index
             AND rs.rs_a_index = a.a_index
             AND p.p_rs_index = rs.rs_index
-        WHERE a.a_index IN (${affiliates.join(",")})
+        WHERE a.a_index IN (${affiliates.map(item => item.a_index).join(",")})
               AND rs.rs_index NOT IN (SELECT distinct rr.rr_rs_index
                                       FROM rentcar_status rs, rentcar_reservation rr
                                       WHERE rs.rs_index = rr.rr_rs_index

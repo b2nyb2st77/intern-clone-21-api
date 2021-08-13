@@ -4,7 +4,7 @@ const dayjs = require("dayjs");
 const TOTAL_HOURS_OF_1DAY = 24;
 
 module.exports = {
-    calculatePriceOfCars: (startTime, endTime, car_list_and_price_list, peak_season_list) => {
+    calculatePriceOfCars: (startTime, endTime, car_list_and_price_list, peak_season_list, available_affiliates) => {
         const start_date = dayjs(startTime);
         const end_date = dayjs(endTime);
         const day  = end_date.diff(start_date, 'day');
@@ -14,7 +14,7 @@ module.exports = {
             hour++;
         }
 
-        let [car_list, price_list] = seperate_car_list_and_price_list(car_list_and_price_list);
+        let [car_list, price_list] = seperate_car_list_and_price_list(car_list_and_price_list, available_affiliates);
 
         const length = car_list.length;
 
@@ -63,12 +63,18 @@ module.exports = {
     },
  };
 
- function seperate_car_list_and_price_list(car_list_and_price_list) {
+ function seperate_car_list_and_price_list(car_list_and_price_list, available_affiliates) {
     let car_list = [];
     let price_list = [];
     const length = car_list_and_price_list.length;
     
     for (let i = 0; i < length; i++) {
+        let isAffiliateAvailable = findIfAffiliateAvailable(available_affiliates, car_list_and_price_list[i]);
+
+        if (!isAffiliateAvailable) {
+            continue;
+        }
+
         let price = new Object();
         price.p_rs_index = car_list_and_price_list[i].p_rs_index;
         price.p_1_or_2_days = car_list_and_price_list[i].p_1_or_2_days;
@@ -114,6 +120,20 @@ module.exports = {
     }
 
     return [car_list, price_list];
+ }
+
+ function findIfAffiliateAvailable(available_affiliates, car_list_and_price_list_item) {
+    let isAffiliateAvailable = false;
+    const length = available_affiliates.length;
+
+    for (let k = 0; k < length; k++) {
+        if (car_list_and_price_list_item.a_index == available_affiliates[k]) {
+            isAffiliateAvailable = true;
+            break;
+        }
+    }
+
+    return isAffiliateAvailable;
  }
 
  function findIfSameCarIsInList(car_list, car_list_and_price_list_item) {

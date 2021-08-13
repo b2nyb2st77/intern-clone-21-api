@@ -60,8 +60,8 @@ module.exports = {
     
     const temporary_start_date = dayjs(temporaray_open_hour_of_affiliate.atoh_start_date).format("YYYY-MM-DD");
     const temporary_end_date = dayjs(temporaray_open_hour_of_affiliate.atoh_end_date).format("YYYY-MM-DD");
-    const temporary_open_time = dayjs(temporaray_open_hour_of_affiliate.atoh_open_time).format("HH:mm:ss");
-    const temporary_close_time = dayjs(temporaray_open_hour_of_affiliate.atoh_close_time).format("HH:mm:ss");
+    const temporary_open_time = temporaray_open_hour_of_affiliate.atoh_open_time;
+    const temporary_close_time = temporaray_open_hour_of_affiliate.atoh_close_time;
 
     if (isDateOrTimeBetweenStartDateAndEndDate(start_date, temporary_start_date, temporary_end_date)) {
         if (isDateOrTimeBetweenStartDateAndEndDate(start_time, temporary_open_time, temporary_close_time)) {

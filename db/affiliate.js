@@ -60,7 +60,7 @@ module.exports = {
         INNER JOIN affiliate a
         ON ps.ps_a_index = a.a_index
         WHERE ps_delete_or_not = 'n'
-              AND a.a_index IN (${affiliates.join(",")})
+              AND a.a_index IN (${affiliates.map(item => item.a_index).join(",")})
               AND ((ps.ps_start_date >= '${startTime}' AND ps.ps_start_date <= '${endTime}') 
                     OR (ps.ps_end_date >= '${startTime}' AND ps.ps_end_date <= '${endTime}')
                     OR (ps.ps_start_date <= '${startTime}' AND ps.ps_end_date >= '${endTime}'));`;
