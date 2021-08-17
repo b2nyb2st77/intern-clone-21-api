@@ -13,12 +13,12 @@ module.exports = {
         for (let i = 0; i < affiliates.length; i++) {
             let temporaray_open_hour_of_affiliate = find_temporaray_open_hour_of_affiliate(affiliates[i], affiliate_temporary_open_hour_list);
 
-            const affiliate_open_time = affiliates[i].a_open_time;
-            const affiliate_close_time = affiliates[i].a_close_time;
+            const affiliate_open_time = affiliates[i].open_time;
+            const affiliate_close_time = affiliates[i].close_time;
             
             if (temporaray_open_hour_of_affiliate.length === 0) {
                 if (isDateOrTimeBetweenStartDateAndEndDate(start_time, affiliate_open_time, affiliate_close_time) && isDateOrTimeBetweenStartDateAndEndDate(end_time, affiliate_open_time, affiliate_close_time)) {
-                    available_affiliates.push(affiliates[i].a_index);
+                    available_affiliates.push(affiliates[i].affiliate_index);
                 }
                 continue;
             }
@@ -28,7 +28,7 @@ module.exports = {
                 checkIfAvailiableOnStartTimeAndEndTime(temporaray_open_hour_of_affiliate[k], start_date, start_time, end_date, end_time, affiliate_open_time, affiliate_close_time);
 
                 if (isStartTimeOk && isEndTimeOk) {
-                    available_affiliates.push(affiliates[i].a_index);
+                    available_affiliates.push(affiliates[i].affiliate_index);
                 }
             }
         }
@@ -42,7 +42,7 @@ module.exports = {
     const length = affiliate_temporary_open_hour_list.length;
 
     for (let k = 0; k < length; k++) {
-        if(affiliate.a_index === affiliate_temporary_open_hour_list[k].atoh_a_index) {
+        if(affiliate.affiliate_index === affiliate_temporary_open_hour_list[k].affiliate_index) {
             temporaray_open_hour_of_affiliate.push(affiliate_temporary_open_hour_list[k]);
         }
     }
@@ -58,10 +58,10 @@ module.exports = {
     let isAvailiableOnStartTime = false;
     let isAvailiableOnEndTime = false;
     
-    const temporary_start_date = dayjs(temporaray_open_hour_of_affiliate.atoh_start_date).format("YYYY-MM-DD");
-    const temporary_end_date = dayjs(temporaray_open_hour_of_affiliate.atoh_end_date).format("YYYY-MM-DD");
-    const temporary_open_time = temporaray_open_hour_of_affiliate.atoh_open_time;
-    const temporary_close_time = temporaray_open_hour_of_affiliate.atoh_close_time;
+    const temporary_start_date = dayjs(temporaray_open_hour_of_affiliate.start_date).format("YYYY-MM-DD");
+    const temporary_end_date = dayjs(temporaray_open_hour_of_affiliate.end_date).format("YYYY-MM-DD");
+    const temporary_open_time = temporaray_open_hour_of_affiliate.open_time;
+    const temporary_close_time = temporaray_open_hour_of_affiliate.close_time;
 
     if (isDateOrTimeBetweenStartDateAndEndDate(start_date, temporary_start_date, temporary_end_date) && isDateOrTimeBetweenStartDateAndEndDate(start_time, temporary_open_time, temporary_close_time)) {
         isAvailiableOnStartTime = true;

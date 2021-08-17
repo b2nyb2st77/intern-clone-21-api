@@ -44,7 +44,7 @@ module.exports = {
         const sql = `
         SELECT atoh_a_index, atoh_start_date, atoh_end_date, atoh_open_time, atoh_close_time
         FROM affiliate_temporary_open_hour
-        WHERE atoh_a_index IN (${affiliates.map(item => item.a_index).join(",")})
+        WHERE atoh_a_index IN (${affiliates.map(item => item.affiliate_index).join(",")})
               AND atoh_delete_or_not = 'n'`;
 
         return connection.query(sql, function(err, result){
@@ -65,7 +65,7 @@ module.exports = {
         INNER JOIN affiliate a
         ON ps.ps_a_index = a.a_index
         WHERE ps_delete_or_not = 'n'
-              AND a.a_index IN (${affiliates.map(item => item.a_index).join(",")})
+              AND a.a_index IN (${affiliates.map(item => item.affiliate_index).join(",")})
               AND ((ps.ps_start_date >= '${startTime}' AND ps.ps_start_date <= '${endTime}') 
                     OR (ps.ps_end_date >= '${startTime}' AND ps.ps_end_date <= '${endTime}')
                     OR (ps.ps_start_date <= '${startTime}' AND ps.ps_end_date >= '${endTime}'));`;
@@ -89,9 +89,9 @@ function affiliateListMapper(result) {
     
     for (let i = 0; i < length; i++) {
         affiliate_list.push({
-            a_index : result[i].a_index,
-            a_open_time : result[i].a_open_time,
-            a_close_time : result[i].a_close_time
+            affiliate_index : result[i].a_index,
+            open_time : result[i].a_open_time,
+            close_time : result[i].a_close_time
         });
     }
 
@@ -104,11 +104,11 @@ function temporaryOpenHourListMapper(result) {
     
     for (let i = 0; i < length; i++) {
         temporary_open_hour_list.push({
-            atoh_a_index : result[i].atoh_a_index,
-            atoh_start_date : result[i].atoh_start_date,
-            atoh_end_date : result[i].atoh_end_date,
-            atoh_open_time : result[i].atoh_open_time,
-            atoh_close_time : result[i].atoh_close_time
+            affiliate_index : result[i].atoh_a_index,
+            start_date : result[i].atoh_start_date,
+            end_date : result[i].atoh_end_date,
+            open_time : result[i].atoh_open_time,
+            close_time : result[i].atoh_close_time
         });
     }
 
@@ -121,9 +121,9 @@ function peakSeasonListMapper(result) {
     
     for (let i = 0; i < length; i++) {
         peak_season_list.push({
-            ps_a_index : result[i].ps_a_index,
-            ps_start_date : result[i].ps_start_date,
-            ps_end_date : result[i].ps_end_date
+            affiliate_index : result[i].ps_a_index,
+            start_date : result[i].ps_start_date,
+            end_date : result[i].ps_end_date
         });
     }
 

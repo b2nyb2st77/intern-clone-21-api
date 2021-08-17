@@ -120,7 +120,7 @@ module.exports = {
     const length = peak_season_list.length;
 
     for (let k = 0; k < length; k++) {
-        if(car.a_index === peak_season_list[k].ps_a_index) {
+        if(car.a_index === peak_season_list[k].affiliate_index) {
             peak_season_of_affiliate.push(peak_season_list[k]);
         }
     }
@@ -145,8 +145,8 @@ module.exports = {
 
             for (let j = 0; j < length; j++) {
                 
-                const ps_start_date = dayjs(peak_season_of_affiliate[j].ps_start_date);
-                const ps_end_date = dayjs(peak_season_of_affiliate[j].ps_end_date);
+                const ps_start_date = dayjs(peak_season_of_affiliate[j].start_date);
+                const ps_end_date = dayjs(peak_season_of_affiliate[j].end_date);
                 
                 if (isDateBetweenStartDateAndEndDate(k, ps_start_date, ps_end_date)) {
                     isDayPeakSeason = true;
