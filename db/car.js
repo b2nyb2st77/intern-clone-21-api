@@ -114,10 +114,10 @@ module.exports = {
     const length = result.length;
     
     for (let i = 0; i < length; i++) {
-        let isSameCarInList = findIfSameCarInList(car_list, result[i]);
+        let [isSameCarInList, carIndex] = findIfAndWhereIsCarInList(car_list, result[i]);
 
         if (isSameCarInList) {
-            car_list[i].price_list.push({
+            car_list[carIndex].price_list.push({
                 p_rs_index : result[i].p_rs_index, 
                 p_1_or_2_days : result[i].p_1_or_2_days, 
                 p_3_or_4_days : result[i].p_3_or_4_days, 
@@ -170,16 +170,18 @@ module.exports = {
     return car_list;
  }
 
- function findIfSameCarInList(car_list, result) {
+ function findIfAndWhereIsCarInList(car_list, result) {
     let isSameCarInList = false;
+    let carIndex = 0;
     const length = car_list.length;
 
     for (let k = 0; k < length; k++) {
         if (car_list[k].rs_index === result.rs_index) {
             isSameCarInList = true;
+            carIndex = k;
             break;
         }
     }
 
-    return isSameCarInList;
+    return [isSameCarInList, carIndex];
  }
