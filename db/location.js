@@ -23,7 +23,7 @@ module.exports = {
     },
     searchLocation: (searchWord, callback) => {
         const sql = `
-        SELECT DISTINCT l_index, l_name, l_immediate_or_not 
+        SELECT DISTINCT l_index, l_name, l_type, l_popular_or_not, l_immediate_or_not, l_subname 
         FROM location
         WHERE l_name LIKE '%${searchWord}%'`;         
 
@@ -32,7 +32,7 @@ module.exports = {
                 callback(err);
             }
             else {
-                let location_list = searchLocationListMapper(result);
+                let location_list = locationListMapper(result);
 
                 callback(null, location_list);
             }
@@ -52,21 +52,6 @@ function locationListMapper(result) {
             l_popular_or_not : result[i].l_popular_or_not,
             l_immediate_or_not : result[i].l_immediate_or_not,
             l_subname : result[i].l_subname
-        });
-    }
-
-    return location_list;
-}
-
-function searchLocationListMapper(result) {
-    let location_list = [];
-    const length = result.length;
-    
-    for (let i = 0; i < length; i++) {
-        location_list.push({
-            l_index : result[i].l_index,
-            l_name : result[i].l_name,
-            l_immediate_or_not : result[i].l_immediate_or_not
         });
     }
 

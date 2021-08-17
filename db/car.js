@@ -114,30 +114,21 @@ module.exports = {
     const length = result.length;
     
     for (let i = 0; i < length; i++) {
-        let isSameCarInList = false;
-        const length = car_list.length;
-
-        for (let k = 0; k < length; k++) {
-            if (car_list[k].rs_index === result[i].rs_index) {
-                isSameCarInList = true;
-
-                car_list[k].price_list.push({
-                    p_rs_index : result[i].p_rs_index, 
-                    p_1_or_2_days : result[i].p_1_or_2_days, 
-                    p_3_or_4_days : result[i].p_3_or_4_days, 
-                    p_5_or_6_days : result[i].p_5_or_6_days, 
-                    p_7_days : result[i].p_7_days, 
-                    p_1_hour : result[i].p_1_hour, 
-                    p_6_hours : result[i].p_6_hours, 
-                    p_12_hours : result[i].p_12_hours, 
-                    p_type : result[i].p_type
-                });
-
-                break;
-            }
-        }
+        let isSameCarInList = findIfSameCarInList(car_list, result[i]);
 
         if (isSameCarInList) {
+            car_list[i].price_list.push({
+                p_rs_index : result[i].p_rs_index, 
+                p_1_or_2_days : result[i].p_1_or_2_days, 
+                p_3_or_4_days : result[i].p_3_or_4_days, 
+                p_5_or_6_days : result[i].p_5_or_6_days, 
+                p_7_days : result[i].p_7_days, 
+                p_1_hour : result[i].p_1_hour, 
+                p_6_hours : result[i].p_6_hours, 
+                p_12_hours : result[i].p_12_hours, 
+                p_type : result[i].p_type
+            });
+
             continue;
         }
 
@@ -177,4 +168,18 @@ module.exports = {
     }
 
     return car_list;
+ }
+
+ function findIfSameCarInList(car_list, result) {
+    let isSameCarInList = false;
+    const length = car_list.length;
+
+    for (let k = 0; k < length; k++) {
+        if (car_list[k].rs_index === result.rs_index) {
+            isSameCarInList = true;
+            break;
+        }
+    }
+
+    return isSameCarInList;
  }
