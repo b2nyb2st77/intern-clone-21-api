@@ -18,18 +18,24 @@ module.exports = {
                 callback(err);
             }
             else {
-                let delivery_location_list = [];
-                const length = result.length;
-                
-                for (let i = 0; i < length; i++) {
-                    delivery_location_list.push({
-                        dl_sido : result[i].dl_sido,
-                        dl_gu : result[i].dl_gu
-                    });
-                }
+                let delivery_location_list = deliveryLocationListMapper(result);
 
                 callback(null, delivery_location_list);
             }
         });
     },
 };
+
+function deliveryLocationListMapper(result) {
+    let delivery_location_list = [];
+    const length = result.length;
+    
+    for (let i = 0; i < length; i++) {
+        delivery_location_list.push({
+            dl_sido : result[i].dl_sido,
+            dl_gu : result[i].dl_gu
+        });
+    }
+
+    return delivery_location_list;
+}
