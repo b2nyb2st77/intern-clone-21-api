@@ -80,50 +80,82 @@ module.exports = {
                 callback(null, peak_season_list);
             }
         });
+    },
+    findNumberOfAffiliatesOfReservedCars: (carName, location, startTime, endTime, callback) => {
+        const sql = `
+        SELECT COUNT(S.name) count
+        FROM (SELECT a.a_name name
+              FROM rentcar_status rs
+              INNER JOIN car c
+              INNER JOIN affiliate a
+              INNER JOIN rentcar_reservation rr
+              INNER JOIN location l
+              ON rs.rs_c_index = c.c_index
+                 AND rs.rs_a_index = a.a_index
+                 AND rs.rs_index = rr.rr_rs_index
+                 AND a.a_l_index = l.l_index
+              WHERE c.c_name = '${carName}'
+                    AND rr.rr_cancel_or_not = 'n'
+                    AND (l.l_name = '${location}' OR l.l_subname = '${location}')
+                    AND a.a_open_time <= '${startTime}' AND a.a_close_time >= '${startTime}'
+                    AND a.a_open_time <= '${endTime}' AND a.a_close_time >= '${endTime}'
+                    AND ((rr.rr_start_time >= '${startTime}' AND rr.rr_start_time <= '${endTime}') 
+                          OR (rr.rr_end_time >= '${startTime}' AND rr.rr_end_time <= '${endTime}')
+                          OR (rr.rr_start_time <= '${startTime}' AND rr.rr_end_time >= '${endTime}'))
+                    GROUP BY a.a_name) AS S;`;
+    
+        return connection.query(sql, function(err, result){
+            if (err) {
+                callback(err);
+            }
+            else {
+                callback(null, result);
+            }
+        });
     }
 };
 
-function affiliateListMapper(result) {
+function affiliateListMapper(affiliates) {
     let affiliate_list = [];
-    const length = result.length;
+    const length = affiliates.length;
     
     for (let i = 0; i < length; i++) {
         affiliate_list.push({
-            affiliate_index : result[i].a_index,
-            open_time : result[i].a_open_time,
-            close_time : result[i].a_close_time
+            affiliate_index : affiliates[i].a_index,
+            open_time : affiliates[i].a_open_time,
+            close_time : affiliates[i].a_close_time
         });
     }
 
     return affiliate_list;
 }
 
-function temporaryOpenHourListMapper(result) {
+function temporaryOpenHourListMapper(temporaray_open_hours) {
     let temporary_open_hour_list = [];
-    const length = result.length;
+    const length = temporaray_open_hours.length;
     
     for (let i = 0; i < length; i++) {
         temporary_open_hour_list.push({
-            affiliate_index : result[i].atoh_a_index,
-            start_date : result[i].atoh_start_date,
-            end_date : result[i].atoh_end_date,
-            open_time : result[i].atoh_open_time,
-            close_time : result[i].atoh_close_time
+            affiliate_index : temporaray_open_hours[i].atoh_a_index,
+            start_date : temporaray_open_hours[i].atoh_start_date,
+            end_date : temporaray_open_hours[i].atoh_end_date,
+            open_time : temporaray_open_hours[i].atoh_open_time,
+            close_time : temporaray_open_hours[i].atoh_close_time
         });
     }
 
     return temporary_open_hour_list;
 }
 
-function peakSeasonListMapper(result) {
+function peakSeasonListMapper(peak_seasons) {
     let peak_season_list = [];
-    const length = result.length;
+    const length = peak_seasons.length;
     
     for (let i = 0; i < length; i++) {
         peak_season_list.push({
-            affiliate_index : result[i].ps_a_index,
-            start_date : result[i].ps_start_date,
-            end_date : result[i].ps_end_date
+            affiliate_index : peak_seasons[i].ps_a_index,
+            start_date : peak_seasons[i].ps_start_date,
+            end_date : peak_seasons[i].ps_end_date
         });
     }
 

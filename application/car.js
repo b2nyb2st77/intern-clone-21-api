@@ -17,15 +17,15 @@ module.exports = {
         });
     },
     findReservedCar: (carName, location, startTime, endTime, res) => {
-        car_repository.findReservedCar(carName, location, startTime, endTime, function(err, result){
-                if (err) {
-                    res.status(404).send({code: "SQL ERROR", errorMessage: err});
-                }
-                else {
-                    res.send(result);
-                }
+        Promise.all(getInfoOfReservedCars(carName, location, startTime, endTime))
+        .then((values) => {
+            if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
+                res.send({number_of_affiliate: values[0], number_of_car: values[1]});  
             }
-        );
+            else {
+                res.status(404).send({code: "SQL ERROR", errorMessage: "RESERVED CARS ERROR"});
+            }
+        });
     },
     findCarList: (location, startTime, endTime, res) => {
         affiliate_repository.findAffiliatesByLocation(location, function(err, affiliates){
@@ -89,4 +89,30 @@ function getCarListAndPriceListAndPeakSeasonListAndAvailableAffiliate(affiliates
     });
 
     return [carListAndPriceList, peakSeasonList, temporaryOpenHourList];
+}
+
+function getInfoOfReservedCars(carName, location, startTime, endTime) {
+    const numberOfAffiliates = new Promise(function(resolve, reject) {
+        affiliate_repository.findNumberOfAffiliatesOfReservedCars(carName, location, startTime, endTime, function(err, result){
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result[0].count);
+            }
+        });
+    });
+    
+    const numberOfCars = new Promise(function(resolve, reject) {
+        car_repository.findNumberOfReservedCars(carName, location, startTime, endTime, function(err, result){
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result[0].count);
+            }
+        });
+    });
+
+    return [numberOfAffiliates, numberOfCars];
 }

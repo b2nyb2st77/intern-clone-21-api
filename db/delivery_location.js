@@ -23,17 +23,17 @@ module.exports = {
                 callback(null, delivery_location_list);
             }
         });
-    },
+    }
 };
 
-function deliveryLocationListMapper(result) {
+function deliveryLocationListMapper(delivery_locations) {
     let delivery_location_list = [];
-    const length = result.length;
+    const length = delivery_locations.length;
     
     for (let i = 0; i < length; i++) {
         delivery_location_list.push({
-            dl_sido : result[i].dl_sido,
-            dl_gu : result[i].dl_gu
+            dl_sido : delivery_locations[i].dl_sido,
+            dl_gu : delivery_locations[i].dl_gu
         });
     }
 

@@ -31,10 +31,7 @@ const router = express.Router();
  *            example:
  *              l_index: 1
  *              l_name: '서울역'
- *              l_type: 'ktx'
- *              l_popular_or_not: 'n'
  *              l_immediate_or_not: 'y'
- *              l_subname: ''
  *          404: 
  *            description: 지역 리스트 검색하기 실패
  *            schema:
