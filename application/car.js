@@ -49,7 +49,7 @@ module.exports = {
                 });
             }
         });
-    },
+    }
 };
 
 function getCarListAndPriceListAndPeakSeasonListAndAvailableAffiliate(affiliates, startTime, endTime) {

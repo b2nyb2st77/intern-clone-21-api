@@ -67,9 +67,9 @@ module.exports = {
     let car_list = [];
     const length = car_list_and_price_list.length;
     
-    for (let i = 0; i < length; i++) {
-        if (findIfAffiliateAvailable(available_affiliates, car_list_and_price_list[i])) {
-            car_list.push({...car_list_and_price_list[i]});
+    for (let k = 0; k < length; k++) {
+        if (findIfAffiliateAvailable(available_affiliates, car_list_and_price_list[k])) {
+            car_list.push({...car_list_and_price_list[k]});
         }
     }
 
@@ -120,7 +120,7 @@ module.exports = {
     const length = peak_season_list.length;
 
     for (let k = 0; k < length; k++) {
-        if(car.a_index === peak_season_list[k].affiliate_index) {
+        if (car.a_index === peak_season_list[k].affiliate_index) {
             peak_season_of_affiliate.push(peak_season_list[k]);
         }
     }
@@ -137,21 +137,21 @@ module.exports = {
     const weekends = weekend_of_affiliate.split(", ");
     const length = peak_season_of_affiliate.length;
 
-    for (let k = start_date; k <= end_date; k = k.add(1, 'day')) {
+    for (let date = start_date; date <= end_date; date = date.add(1, 'day')) {
         
         let isDayPeakSeason = false;
 
         if (peak_season_of_affiliate != null && peak_season_of_affiliate != undefined && length != 0) {
 
-            for (let j = 0; j < length; j++) {
+            for (let k = 0; k < length; k++) {
                 
-                const ps_start_date = dayjs(peak_season_of_affiliate[j].start_date);
-                const ps_end_date = dayjs(peak_season_of_affiliate[j].end_date);
+                const ps_start_date = dayjs(peak_season_of_affiliate[k].start_date);
+                const ps_end_date = dayjs(peak_season_of_affiliate[k].end_date);
                 
-                if (isDateBetweenStartDateAndEndDate(k, ps_start_date, ps_end_date)) {
+                if (isDateBetweenStartDateAndEndDate(date, ps_start_date, ps_end_date)) {
                     isDayPeakSeason = true;
 
-                    if (isDateSame(k, end_date)) {
+                    if (isDateSame(date, end_date)) {
                         type_of_last_day = "peakseason";
                     }
                     else {
@@ -165,9 +165,9 @@ module.exports = {
             }
         }
 
-        const day = k.day().toString();
+        const day = date.day().toString();
 
-        if (isDateSame(k, end_date)) {
+        if (isDateSame(date, end_date)) {
             type_of_last_day = (!~weekends.indexOf(day)) ? "weekdays" : "weekend";
         }
         else {
