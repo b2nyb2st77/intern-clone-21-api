@@ -23,7 +23,7 @@ module.exports = {
 
             let price_list_of_car = car_list[i].price_list;
             let [weekend_price, weekdays_price, peak_season_price] = classify_price_list_by_price_type(price_list_of_car);
-            let peak_season_of_affiliate = find_peak_seasons_of_affiliate(car_list[i], peak_season_list);
+            let peak_season_of_affiliate = peak_season_list.filter(peak_season => peak_season.affiliate_index === car_list[i].a_index);
             let weekend_of_affiliate = car_list[i].a_weekend;
 
             let [number_of_peak_season_days, number_of_weekdays, number_of_weekend, type_of_last_day] = 
@@ -68,26 +68,13 @@ module.exports = {
     const length = car_list_and_price_list.length;
     
     for (let k = 0; k < length; k++) {
-        if (findIfAffiliateAvailable(available_affiliates, car_list_and_price_list[k])) {
+        const isAffiliateAvailable = available_affiliates.find(element => element === car_list_and_price_list[k].a_index);
+        if (isAffiliateAvailable != undefined && isAffiliateAvailable != null) {
             car_list.push({...car_list_and_price_list[k]});
         }
     }
 
     return car_list;
- }
-
- function findIfAffiliateAvailable(available_affiliates, car_list_and_price_list_item) {
-    let isAffiliateAvailable = false;
-    const length = available_affiliates.length;
-
-    for (let k = 0; k < length; k++) {
-        if (car_list_and_price_list_item.a_index == available_affiliates[k]) {
-            isAffiliateAvailable = true;
-            break;
-        }
-    }
-
-    return isAffiliateAvailable;
  }
 
  function classify_price_list_by_price_type(price_list_of_car) {
@@ -113,19 +100,6 @@ module.exports = {
     }
 
     return [weekend_price, weekdays_price, peak_season_price];
- }
-
- function find_peak_seasons_of_affiliate(car, peak_season_list) {
-    let peak_season_of_affiliate = [];
-    const length = peak_season_list.length;
-
-    for (let k = 0; k < length; k++) {
-        if (car.a_index === peak_season_list[k].affiliate_index) {
-            peak_season_of_affiliate.push(peak_season_list[k]);
-        }
-    }
-
-    return peak_season_of_affiliate;
  }
 
  function calculateNumberOfEachTypeOfDaysAndFindTypeOfLastDay(start_date, end_date, peak_season_of_affiliate, weekend_of_affiliate) {
@@ -179,7 +153,7 @@ module.exports = {
  }
 
  function isDateSame(date1, date2) {
-    return (date1.diff(date2, 'day') == 0);
+    return (date1.diff(date2, 'day') === 0);
  }
 
  function isDateBetweenStartDateAndEndDate(date, start, end) { 

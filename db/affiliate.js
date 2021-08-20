@@ -66,9 +66,9 @@ module.exports = {
         ON ps.ps_a_index = a.a_index
         WHERE ps_delete_or_not = 'n'
               AND a.a_index IN (${affiliates.map(item => item.affiliate_index).join(",")})
-              AND ((ps.ps_start_date >= '${startTime}' AND ps.ps_start_date <= '${endTime}') 
-                    OR (ps.ps_end_date >= '${startTime}' AND ps.ps_end_date <= '${endTime}')
-                    OR (ps.ps_start_date <= '${startTime}' AND ps.ps_end_date >= '${endTime}'));`;
+              AND ((ps.ps_start_date <= '${startTime}' AND '${startTime}' <= 'ps.ps_end_date') 
+                    OR (ps.ps_start_date <= '${endTime}' AND '${endTime}' <= 'ps.ps_end_date') 
+                    OR (ps.ps_start_date >= '${startTime}' AND ps.ps_end_date <= '${endTime}'));`;
 
         return connection.query(sql, function(err, result){
             if (err) {
