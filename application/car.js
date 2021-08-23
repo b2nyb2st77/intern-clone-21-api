@@ -19,11 +19,12 @@ module.exports = {
     findReservedCar: (carName, location, startTime, endTime, res) => {
         Promise.all(getInfoOfReservedCars(carName, location, startTime, endTime))
         .then((values) => {
-            if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null) {
-                res.send({number_of_affiliate: values[0], number_of_car: values[1]});  
+            if (values[0] == null || values[1] == null) {
+                console.log(values);
+                res.status(404).send({code: "SQL ERROR", errorMessage: "RESERVED CARS ERROR"});
             }
             else {
-                res.status(404).send({code: "SQL ERROR", errorMessage: "RESERVED CARS ERROR"});
+                res.send({number_of_affiliate: values[0], number_of_car: values[1]});  
             }
         });
     },
@@ -35,16 +36,16 @@ module.exports = {
             else {
                 Promise.all(getCarListAndPriceListAndPeakSeasonListAndAvailableAffiliate(affiliates, startTime, endTime))
                 .then((values) => {
-                    if (values[0] != undefined && values[0] != null && values[1] != undefined && values[1] != null && values[2] != undefined && values[2] != null) {
+                    if (!(values[0] && values[1] && values[2])) {
+                        res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
+                    }
+                    else {
                         try {
                             car_list = calculate_price.calculatePriceOfCars(startTime, endTime, values[0], values[1], values[2]);
                             res.send(car_list);
                         } catch (error) {
                             res.status(404).send({code: "CARCULATE PRICE ERROR", errorMessage: error});
                         }
-                    }
-                    else {
-                        res.status(404).send({code: "SQL ERROR", errorMessage: "CAR LIST ERROR"});
                     }
                 });
             }
@@ -83,7 +84,6 @@ function getCarListAndPriceListAndPeakSeasonListAndAvailableAffiliate(affiliates
             else {
                 const available_affiliates = check_open_hour.findAvailableAffiliate(startTime, endTime, affiliates, result);
                 resolve(available_affiliates);
-                
             }
         });
     });

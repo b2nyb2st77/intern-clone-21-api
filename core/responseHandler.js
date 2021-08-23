@@ -9,5 +9,5 @@ module.exports = {
     },
     responseInjectionError: (res) => {
         res.status(406).send({code: "406 INJECTION ERROR"});
-    },
+    }
 };

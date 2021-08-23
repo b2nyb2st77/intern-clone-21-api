@@ -12,7 +12,7 @@ module.exports = {
         return (typeof str === "undefined" || str === null || str === "") ? true : false;
     },
     checkInjection: (obj) => {
-        if (obj.length <= 0) {
+        if (!obj.length) {
             return false;
         }
         

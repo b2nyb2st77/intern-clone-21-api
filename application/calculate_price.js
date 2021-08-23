@@ -68,8 +68,8 @@ module.exports = {
     const length = car_list_and_price_list.length;
     
     for (let k = 0; k < length; k++) {
-        const isAffiliateAvailable = available_affiliates.find(element => element === car_list_and_price_list[k].a_index);
-        if (isAffiliateAvailable != undefined && isAffiliateAvailable != null) {
+        const findAvailableAffiliate = available_affiliates.find(element => element === car_list_and_price_list[k].a_index);
+        if (findAvailableAffiliate) {
             car_list.push({...car_list_and_price_list[k]});
         }
     }
@@ -115,7 +115,7 @@ module.exports = {
         
         let isDayPeakSeason = false;
 
-        if (peak_season_of_affiliate != null && peak_season_of_affiliate != undefined && length != 0) {
+        if (peak_season_of_affiliate && length) {
 
             for (let k = 0; k < length; k++) {
                 

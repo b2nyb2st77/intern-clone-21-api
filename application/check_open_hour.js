@@ -16,7 +16,7 @@ module.exports = {
             const affiliate_open_time = affiliates[i].open_time;
             const affiliate_close_time = affiliates[i].close_time;
             
-            if (temporaray_open_hour_of_affiliate.length === 0) {
+            if (!temporaray_open_hour_of_affiliate.length) {
                 if (isTimeBetweenStartTimeAndEndTime(start_time, affiliate_open_time, affiliate_close_time) && isTimeBetweenStartTimeAndEndTime(end_time, affiliate_open_time, affiliate_close_time)) {
                     available_affiliates.push(affiliates[i].affiliate_index);
                 }

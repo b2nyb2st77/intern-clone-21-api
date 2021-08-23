@@ -50,15 +50,15 @@ function locationListMapper(locations) {
         location.l_name = locations[i].l_name;
         location.l_immediate_or_not = locations[i].l_immediate_or_not;
 
-        if (locations[i].l_type != null && locations[i].l_type != undefined) {
+        if (locations[i].l_type) {
             location.l_type = locations[i].l_type;
         }
 
-        if (locations[i].l_popular_or_not != null && locations[i].l_popular_or_not != undefined) {
+        if (locations[i].l_popular_or_not) {
             location.l_popular_or_not = locations[i].l_popular_or_not;
         }
 
-        if (locations[i].l_subname != null && locations[i].l_subname != undefined) {
+        if (locations[i].l_subname) {
             location.l_subname = locations[i].l_subname;
         }
 
