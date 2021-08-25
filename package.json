@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npx nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -24,7 +25,9 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "eslint-plugin-promise": "^5.1.0",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.1.2"
   },
   "repository": {
     "type": "git",
@@ -34,5 +37,16 @@
     "url": "https://github.com/b2nyb2st77/intern-clone-21-api/issues"
   },
   "homepage": "https://github.com/b2nyb2st77/intern-clone-21-api#readme",
-  "description": ""
+  "description": "",
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
 }

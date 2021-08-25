@@ -1,11 +1,11 @@
-const express = require("express");
+const express = require('express')
 
-const response_handler = require("../core/responseHandler");
-const validate = require("../core/validate");
-const error = require("../core/error");
-const application = require("../application/affiliate");
+const responseHandler = require('../core/responseHandler')
+const validate = require('../core/validate')
+const error = require('../core/error')
+const application = require('../application/affiliate')
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * @swagger
@@ -23,8 +23,8 @@ const router = express.Router();
  *          description: 업체 고유번호
  *          required: true
  *          type: integer
- *        responses: 
- *          200: 
+ *        responses:
+ *          200:
  *            description: 업체 정보 불러오기 성공
  *            schema:
  *              $ref: '#/definitions/Affiliate_one'
@@ -39,26 +39,26 @@ const router = express.Router();
  *              a_open_time: 08:00:00
  *              a_close_time: 22:00:00
  *              a_weekend: 0, 6
- *          404: 
+ *          404:
  *            description: 업체 정보 불러오기 실패
  *            schema:
  *              $ref: '#/definitions/Error_404'
  *            example:
  *              code: 'NOT FOUND'
- *          406: 
+ *          406:
  *            description: sql injection 발생
  *            schema:
  *              $ref: '#/definitions/Error_406'
  *            example:
  *              code: 'INJECTION ERROR'
- *          501: 
+ *          501:
  *            description: index값 오류
  *            schema:
  *              $ref: '#/definitions/Error_501'
  *            example:
  *              code: '501 ERROR'
  *              errorMessage: 'PARAMETER IS EMPTY'
- * 
+ *
  * definitions:
  *   Affiliate_one:
  *     type: object
@@ -109,25 +109,25 @@ const router = express.Router();
  *         type: string
  *         description: 업체 주말
  */
-router.get("/:index", function(req, res){
-    const index = req.params.index;
+router.get('/:index', function (req, res) {
+  const index = req.params.index
 
-    if (validate.isEmpty(index)) {
-        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
-        return;
-    }
+  if (validate.isEmpty(index)) {
+    responseHandler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE)
+    return
+  }
 
-    if (!validate.checkInjection(index)) {
-        response_handler.responseInjectionError(res);
-        return;
-    }
-    
-    if (!validate.validateRequestInteger(index)) {
-        response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
-        return;
-    }
+  if (!validate.checkInjection(index)) {
+    responseHandler.responseInjectionError(res)
+    return
+  }
 
-    application.findOneAffiliate(index, res);
-});
+  if (!validate.validateRequestInteger(index)) {
+    responseHandler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE)
+    return
+  }
 
-module.exports = router;
+  application.findOneAffiliate(index, res)
+})
+
+module.exports = router

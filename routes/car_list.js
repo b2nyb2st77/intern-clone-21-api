@@ -1,12 +1,12 @@
-const express = require("express");
+const express = require('express')
 
-const response_handler = require("../core/responseHandler");
-const validate = require("../core/validate");
-const error = require("../core/error");
-const application = require("../application/car");
-const time = require("../application/check_time");
+const responseHandler = require('../core/responseHandler')
+const validate = require('../core/validate')
+const error = require('../core/error')
+const application = require('../application/car')
+const time = require('../application/check_time')
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * @swagger
@@ -23,7 +23,7 @@ const router = express.Router();
  *          in: query
  *          description: 지역
  *          required: true
- *          type: string
+ *          type: integer
  *        - name: startTime
  *          in: query
  *          description: 대여시간
@@ -36,8 +36,8 @@ const router = express.Router();
  *          required: true
  *          type: string
  *          format: date-time
- *        responses: 
- *          200: 
+ *        responses:
+ *          200:
  *            description: 차량 리스트 불러오기 성공
  *            schema:
  *              $ref: '#/definitions/Car_list'
@@ -62,26 +62,26 @@ const router = express.Router();
  *              a_new_or_not: 'n'
  *              rs_index: 1
  *              car_price: 55000
- *          404: 
+ *          404:
  *            description: 차량 리스트 불러오기 실패
  *            schema:
  *              $ref: '#/definitions/Error_404'
  *            example:
  *              code: 'NOT FOUND'
- *          406: 
+ *          406:
  *            description: sql injection 발생
  *            schema:
  *              $ref: '#/definitions/Error_406'
  *            example:
  *              code: 'INJECTION ERROR'
- *          501: 
+ *          501:
  *            description: 파라미터값 오류
  *            schema:
  *              $ref: '#/definitions/Error_501'
  *            example:
  *              code: '501 ERROR'
  *              errorMessage: 'PARAMETER IS EMPTY'
- * 
+ *
  * definitions:
  *   Car_list:
  *     type: object
@@ -171,28 +171,28 @@ const router = express.Router();
  *         type: integer
  *         description: 렌트가능차량 가격
  */
-router.get("/", function(req, res){
-    const location = decodeURIComponent(req.query.location);
-    const { startTime, endTime } = req.query;
-    
-    if (validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
-        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
-        return;
-    }
-    
-    if (!validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
-        response_handler.responseInjectionError(res);
-        return;
-    }
-    
-    if (!validate.validateRequestDatetime(startTime, endTime)) {
-        response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
-        return;
-    }
-    
-    if(!time.checkTimeError(startTime, endTime, res)) return;
+router.get('/', function (req, res) {
+  const location = decodeURIComponent(req.query.location)
+  const { startTime, endTime } = req.query
 
-    application.findCarList(location, startTime, endTime, res);
-});
+  if (validate.isEmpty(location) || validate.isEmpty(startTime) || validate.isEmpty(endTime)) {
+    responseHandler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE)
+    return
+  }
 
-module.exports = router;
+  if (!validate.checkInjection(location) || !validate.checkInjection(startTime) || !validate.checkInjection(endTime)) {
+    responseHandler.responseInjectionError(res)
+    return
+  }
+
+  if (!validate.validateRequestDatetime(startTime, endTime)) {
+    responseHandler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE)
+    return
+  }
+
+  if (!time.checkTimeError(startTime, endTime, res)) return
+
+  application.findCarList(location, startTime, endTime, res)
+})
+
+module.exports = router

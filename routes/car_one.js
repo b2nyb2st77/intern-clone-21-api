@@ -1,11 +1,11 @@
-const express = require("express");
+const express = require('express')
 
-const response_handler = require("../core/responseHandler");
-const validate = require("../core/validate");
-const error = require("../core/error");
-const application = require("../application/car");
+const responseHandler = require('../core/responseHandler')
+const validate = require('../core/validate')
+const error = require('../core/error')
+const application = require('../application/car')
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * @swagger
@@ -23,8 +23,8 @@ const router = express.Router();
  *          description: 차량 고유번호
  *          required: true
  *          type: integer
- *        responses: 
- *          200: 
+ *        responses:
+ *          200:
  *            description: 차량 정보 불러오기 성공
  *            schema:
  *              $ref: '#/definitions/Car_one'
@@ -41,26 +41,26 @@ const router = express.Router();
  *              c_fuel: '휘발유'
  *              c_description: '경차 최고의 실내공간 깡패'
  *              c_driver_age: 21
- *          404: 
+ *          404:
  *            description: 차량 정보 불러오기 실패
  *            schema:
  *              $ref: '#/definitions/Error_404'
  *            example:
  *              code: 'NOT FOUND'
- *          406: 
+ *          406:
  *            description: sql injection 발생
  *            schema:
  *              $ref: '#/definitions/Error_406'
  *            example:
  *              code: 'INJECTION ERROR'
- *          501: 
+ *          501:
  *            description: index값 오류
  *            schema:
  *              $ref: '#/definitions/Error_501'
  *            example:
  *              code: '501 ERROR'
  *              errorMessage: 'PARAMETER IS EMPTY'
- * 
+ *
  * definitions:
  *   Car_one:
  *     type: object
@@ -116,25 +116,25 @@ const router = express.Router();
  *         type: integer
  *         description: 자동차 보험나이
  */
-router.get("/:index", function(req, res){
-    const index = req.params.index;
+router.get('/:index', function (req, res) {
+  const index = req.params.index
 
-    if (validate.isEmpty(index)) {
-        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
-        return;
-    }
-    
-    if (!validate.checkInjection(index)) {
-        response_handler.responseInjectionError(res);
-        return;
-    }
+  if (validate.isEmpty(index)) {
+    responseHandler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE)
+    return
+  }
 
-    if (!validate.validateRequestInteger(index)) {
-        response_handler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE);
-        return;
-    }
-    
-    application.findOneCar(index, res);
-});
+  if (!validate.checkInjection(index)) {
+    responseHandler.responseInjectionError(res)
+    return
+  }
 
-module.exports = router;
+  if (!validate.validateRequestInteger(index)) {
+    responseHandler.responseValidateError(res, error.PRECONDITION_FAILED, error.VALIDATION_ERROR_MESSAGE)
+    return
+  }
+
+  application.findOneCar(index, res)
+})
+
+module.exports = router

@@ -1,69 +1,65 @@
-const express = require("express");
+const mysql = require('../db/mysql')
 
-const mysql = require("../db/mysql");
-
-const connection = mysql.init();
+const connection = mysql.init()
 
 module.exports = {
-    findLocations: (callback) => {
-        let sql = `
+  findLocations: (callback) => {
+    const sql = `
         SELECT l_index, l_name, l_type, l_popular_or_not, l_immediate_or_not, l_subname
-        FROM location`;
+        FROM location`
 
-        return connection.query(sql, function(err, result){
-            if (err) {
-                callback(err);
-            }
-            else {
-                let location_list = locationListMapper(result);
+    return connection.query(sql, function (err, result) {
+      if (err) {
+        callback(err)
+      } else {
+        const locationList = locationListMapper(result)
 
-                callback(null, location_list);
-            }
-        });
-    },
-    searchLocation: (searchWord, callback) => {
-        const sql = `
+        callback(null, locationList)
+      }
+    })
+  },
+  searchLocation: (searchWord, callback) => {
+    const sql = `
         SELECT DISTINCT l_index, l_name, l_immediate_or_not
         FROM location
-        WHERE l_name LIKE '%${searchWord}%'`;         
+        WHERE l_name LIKE '%${searchWord}%'`
 
-        return connection.query(sql, function(err, result){
-            if (err) {
-                callback(err);
-            }
-            else {
-                let location_list = locationListMapper(result);
+    return connection.query(sql, function (err, result) {
+      if (err) {
+        callback(err)
+      } else {
+        const locationList = locationListMapper(result)
 
-                callback(null, location_list);
-            }
-        });
-    },
-};
+        callback(null, locationList)
+      }
+    })
+  }
+}
 
-function locationListMapper(locations) {
-    let location_list = [];
-    const length = locations.length;
-    
-    for (let i = 0; i < length; i++) {
-        let location = new Object();
-        location.l_index = locations[i].l_index;
-        location.l_name = locations[i].l_name;
-        location.l_immediate_or_not = locations[i].l_immediate_or_not;
+function locationListMapper (locations) {
+  const locationList = []
+  const length = locations.length
 
-        if (locations[i].l_type) {
-            location.l_type = locations[i].l_type;
-        }
+  for (let i = 0; i < length; i++) {
+    const location = {}
+    location.l_index = locations[i].l_index
+    location.l_name = locations[i].l_name
+    location.l_immediate_or_not = locations[i].l_immediate_or_not
 
-        if (locations[i].l_popular_or_not) {
-            location.l_popular_or_not = locations[i].l_popular_or_not;
-        }
-
-        if (locations[i].l_subname) {
-            location.l_subname = locations[i].l_subname;
-        }
-
-        location_list.push(location);
+    if (locations[i].l_type) {
+      location.l_type = locations[i].l_type
     }
 
-    return location_list;
+    if (locations[i].l_popular_or_not) {
+      location.l_popular_or_not = locations[i].l_popular_or_not
+    }
+
+    if (locations[i].l_subname) {
+      location.l_subname = locations[i].l_subname
+    }
+
+    locationList.push(location)
+  }
+
+  return locationList
 }

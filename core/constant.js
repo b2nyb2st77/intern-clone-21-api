@@ -1,7 +1,7 @@
-const MINIMUM_HOURS_OF_RENT = 24;
-const MAXIMUM_DAYS_OF_RENT = 14;
+const MINIMUM_HOURS_OF_RENT = 24
+const MAXIMUM_DAYS_OF_RENT = 14
 
-module.exports = { 
-    MINIMUM_HOURS_OF_RENT,
-    MAXIMUM_DAYS_OF_RENT
-};
+module.exports = {
+  MINIMUM_HOURS_OF_RENT,
+  MAXIMUM_DAYS_OF_RENT
+}

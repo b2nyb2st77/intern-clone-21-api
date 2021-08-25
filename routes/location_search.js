@@ -1,11 +1,11 @@
-const express = require("express");
+const express = require('express')
 
-const response_handler = require("../core/responseHandler");
-const validate = require("../core/validate");
-const error = require("../core/error");
-const application = require("../application/location");
+const responseHandler = require('../core/responseHandler')
+const validate = require('../core/validate')
+const error = require('../core/error')
+const application = require('../application/location')
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * @swagger
@@ -23,8 +23,8 @@ const router = express.Router();
  *          description: 검색단어
  *          required: true
  *          type: string
- *        responses: 
- *          200: 
+ *        responses:
+ *          200:
  *            description: 지역 리스트 검색하기 성공
  *            schema:
  *              $ref: '#/definitions/Location_list'
@@ -32,26 +32,26 @@ const router = express.Router();
  *              l_index: 1
  *              l_name: '서울역'
  *              l_immediate_or_not: 'y'
- *          404: 
+ *          404:
  *            description: 지역 리스트 검색하기 실패
  *            schema:
  *              $ref: '#/definitions/Error_404'
  *            example:
  *              code: 'NOT FOUND'
- *          406: 
+ *          406:
  *            description: sql injection 발생
  *            schema:
  *              $ref: '#/definitions/Error_406'
  *            example:
  *              code: 'INJECTION ERROR'
- *          501: 
+ *          501:
  *            description: searchWord값 오류
  *            schema:
  *              $ref: '#/definitions/Error_501'
  *            example:
  *              code: '501 ERROR'
  *              errorMessage: 'PARAMETER IS EMPTY'
- * 
+ *
  * definitions:
  *   Location_list:
  *     type: object
@@ -105,20 +105,20 @@ const router = express.Router();
  *         type: string
  *         description: 오류 내용
  */
-router.get("/", function(req, res){
-    const searchWord = decodeURIComponent(req.query.searchWord);
+router.get('/', function (req, res) {
+  const searchWord = decodeURIComponent(req.query.searchWord)
 
-    if (validate.isEmpty(searchWord)) {
-        response_handler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE);
-        return;
-    }
+  if (validate.isEmpty(searchWord)) {
+    responseHandler.responseValidateError(res, error.LENGTH_REQUIRED, error.PARAMETER_ERROR_MESSAGE)
+    return
+  }
 
-    if (!validate.checkInjection(searchWord)) {
-        response_handler.responseInjectionError(res);
-        return;
-    }
+  if (!validate.checkInjection(searchWord)) {
+    responseHandler.responseInjectionError(res)
+    return
+  }
 
-    application.searchLocation(searchWord, res);
-});
+  application.searchLocation(searchWord, res)
+})
 
-module.exports = router;
+module.exports = router
