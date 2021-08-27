@@ -45,7 +45,7 @@ module.exports = {
             })
         }
         else {
-          res.send({});
+          res.send([]);
         }
       }
     })
